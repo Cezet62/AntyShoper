@@ -262,7 +262,6 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
                         </div>
                         <inpost-geowidget
                             ref={geoWidgetRef}
-                            onpoint="onPointSelected"
                             token="eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzQlpXVzFNZzVlQnpDYU1XU3JvTlBjRWFveFpXcW9Ua2FuZVB3X291LWxvIn0.eyJleHAiOjIwMzIwNDU4NTMsImlhdCI6MTcxNjY4NTg1MywianRpIjoiZTA0MWI2OTEtMTZhMy00MjMxLWI4MjgtN2E3NWMyN2Q2YjM5IiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5pbnBvc3QucGwvYXV0aC9yZWFsbXMvZXh0ZXJuYWwiLCJzdWIiOiJmOjEyNDc1MDUxLTFjMDMtNGU1OS1iYTBjLTJiNDU2OTdlODUxNzp0R3RwS1NqRDFMSVdXU0tWLWZvLTdvZ2lCNnVKLXdEa0lKYjNBd29kYU5FIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoic2hpcHgiLCJzZXNzaW9uX3N0YXRlIjoiNjUzOTM3YmMtMGJlNC00N2QxLTk1NjctNGU2YWQ2YjQ0ZTk2IiwiYWNyIjoiMSIsInNjb3BlIjoib3BlbmlkIGFwaTphcGlwb2ludHMiLCJzaWQiOiI2NTM5MzdiYy0wYmU0LTQ3ZDEtOTU2Ny00ZTZhZDZiNDRlOTYiLCJhbGxvd2VkX3JlZmVycmVycyI6IiIsInV1aWQiOiI5YTFiNTAzZi1jMGEzLTQxY2MtYjRmNi1iYmU5Mzk5NDQ5YzMifQ.Vz4FwrJd3Cg3yRXZbU5CbLjdM2sN6t5YOd7B8UyWb8cIu4W9X6D2F8EtQvXmLn5P3K4I1HdG0JfR7YmN9AwzQ"
                             language="pl"
                             config="parcelcollect"
