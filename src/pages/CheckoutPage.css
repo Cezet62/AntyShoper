@@ -1,0 +1,142 @@
+.checkout-page {
+    padding: 40px 0;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    min-height: 80vh;
+}
+
+.checkout-page h1 {
+    margin-bottom: 30px;
+}
+
+.checkout-layout {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.checkout-form {
+    flex: 2;
+    min-width: 300px;
+}
+
+.form-section {
+    background-color: var(--color-surface);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    margin-bottom: 25px;
+    border: 1px solid var(--color-border);
+}
+
+.form-section h3 {
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+    color: var(--color-text);
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    flex: 1;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    background-color: #0f172a;
+    border: 1px solid var(--color-border);
+    color: white;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.payment-methods {
+    display: flex;
+    gap: 15px;
+}
+
+.payment-option {
+    flex: 1;
+    padding: 20px;
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    background-color: #0f172a;
+}
+
+.payment-option:hover {
+    border-color: #64748b;
+}
+
+.payment-option.selected {
+    border-color: var(--color-primary);
+    background-color: rgba(37, 99, 235, 0.1);
+    color: var(--color-primary);
+}
+
+.order-summary-sidebar {
+    flex: 1;
+    min-width: 280px;
+}
+
+.summary-card {
+    background-color: var(--color-surface);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+    position: sticky;
+    top: 20px;
+}
+
+.summary-card h3 {
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+.summary-items {
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.summary-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 25px;
+    color: var(--color-text);
+}
+
+.btn-full {
+    width: 100%;
+}

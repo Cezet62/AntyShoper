@@ -1,0 +1,189 @@
+.product-showcase {
+    padding: 40px 0;
+    background-color: var(--color-background);
+}
+
+.showcase-container {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+/* Banner */
+.promo-banner {
+    flex: 1;
+    min-width: 300px;
+    min-height: 400px;
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--border-radius);
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 30px;
+    overflow: hidden;
+}
+
+.promo-banner::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.promo-content {
+    position: relative;
+    z-index: 1;
+    color: white;
+}
+
+.promo-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.promo-subtitle {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+.btn-promo {
+    background-color: var(--color-accent);
+    color: white;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Products Section */
+.products-section {
+    flex: 2;
+    min-width: 300px;
+}
+
+.products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.products-header h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--color-text);
+}
+
+.highlight-text {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    margin-left: 10px;
+    text-transform: none;
+}
+
+.products-nav button {
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+.products-grid {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.product-card {
+    background-color: white;
+    min-width: 220px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    padding: 15px;
+    position: relative;
+}
+
+.product-image {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.product-image img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.add-to-cart-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background-color: var(--color-accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    opacity: 0;
+    /* Hidden by default or shown on hover? Design shows plus button */
+    transition: opacity 0.2s;
+}
+
+.product-card:hover .add-to-cart-btn {
+    opacity: 1;
+}
+
+.product-details h4 {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.product-code {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-bottom: 10px;
+}
+
+.product-price {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.current-price {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #333;
+}
+
+.old-price {
+    font-size: 0.8rem;
+    text-decoration: line-through;
+    color: #ef4444;
+    /* Red for removed price in design? Or gray? Design seems to have red strikethrough or just red text */
+}
