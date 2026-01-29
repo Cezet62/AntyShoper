@@ -21,54 +21,65 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
     const [selectedLocker, setSelectedLocker] = useState(null);
     const [showGeoWidget, setShowGeoWidget] = useState(false);
 
-    // Ładowanie skryptu GeoWidget InPost
+    // Ładowanie skryptu EasyPack InPost
     useEffect(() => {
+        // Dodaj CSS
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://geowidget.easypack24.net/css/easypack.css';
+        document.head.appendChild(link);
+
+        // Dodaj skrypt
         const script = document.createElement('script');
-        script.src = 'https://geowidget.inpost.pl/inpost-geowidget.js';
+        script.src = 'https://geowidget.easypack24.net/js/sdk-for-javascript.js';
         script.async = true;
         document.body.appendChild(script);
 
         return () => {
+            if (document.head.contains(link)) {
+                document.head.removeChild(link);
+            }
             if (document.body.contains(script)) {
                 document.body.removeChild(script);
             }
         };
     }, []);
 
-    // Tworzenie GeoWidget dynamicznie gdy modal jest otwarty
+    // Inicjalizacja mapy EasyPack gdy modal jest otwarty
     useEffect(() => {
-        if (showGeoWidget && geoWidgetContainerRef.current) {
+        if (showGeoWidget && geoWidgetContainerRef.current && window.easyPack) {
             // Wyczyść kontener
             geoWidgetContainerRef.current.innerHTML = '';
 
-            // Utwórz element GeoWidget dynamicznie
-            const widget = document.createElement('inpost-geowidget');
-            widget.setAttribute('token', 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzQlpXVzFNZzVlQnpDYU1XU3JvTlBjRWFveFpXcW9Ua2FuZVB3X291LWxvIn0.eyJleHAiOjIwMzIwNDU4NTMsImlhdCI6MTcxNjY4NTg1MywianRpIjoiZTA0MWI2OTEtMTZhMy00MjMxLWI4MjgtN2E3NWMyN2Q2YjM5IiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5pbnBvc3QucGwvYXV0aC9yZWFsbXMvZXh0ZXJuYWwiLCJzdWIiOiJmOjEyNDc1MDUxLTFjMDMtNGU1OS1iYTBjLTJiNDU2OTdlODUxNzp0R3RwS1NqRDFMSVdXU0tWLWZvLTdvZ2lCNnVKLXdEa0lKYjNBd29kYU5FIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoic2hpcHgiLCJzZXNzaW9uX3N0YXRlIjoiNjUzOTM3YmMtMGJlNC00N2QxLTk1NjctNGU2YWQ2YjQ0ZTk2IiwiYWNyIjoiMSIsInNjb3BlIjoib3BlbmlkIGFwaTphcGlwb2ludHMiLCJzaWQiOiI2NTM5MzdiYy0wYmU0LTQ3ZDEtOTU2Ny00ZTZhZDZiNDRlOTYiLCJhbGxvd2VkX3JlZmVycmVycyI6IiIsInV1aWQiOiI5YTFiNTAzZi1jMGEzLTQxY2MtYjRmNi1iYmU5Mzk5NDQ5YzMifQ.Vz4FwrJd3Cg3yRXZbU5CbLjdM2sN6t5YOd7B8UyWb8cIu4W9X6D2F8EtQvXmLn5P3K4I1HdG0JfR7YmN9AwzQ');
-            widget.setAttribute('language', 'pl');
-            widget.setAttribute('config', 'parcelcollect');
+            // Utwórz div dla mapy
+            const mapDiv = document.createElement('div');
+            mapDiv.id = 'easypack-map';
+            geoWidgetContainerRef.current.appendChild(mapDiv);
 
-            geoWidgetContainerRef.current.appendChild(widget);
+            // Inicjalizuj mapę
+            window.easyPack.init({
+                defaultLocale: 'pl',
+                mapType: 'osm',
+                searchType: 'osm',
+                points: {
+                    types: ['parcel_locker']
+                },
+                map: {
+                    initialTypes: ['parcel_locker']
+                }
+            });
+
+            window.easyPack.mapWidget('easypack-map', function(point) {
+                setSelectedLocker({
+                    name: point.name,
+                    address: point.address.line1,
+                    city: point.address.line2,
+                    postCode: point.address_details?.post_code || ''
+                });
+                setShowGeoWidget(false);
+            });
         }
     }, [showGeoWidget]);
-
-    // Nasłuchiwanie na wybór paczkomatu
-    useEffect(() => {
-        const handlePointSelect = (event) => {
-            const point = event.detail;
-            setSelectedLocker({
-                name: point.name,
-                address: point.address?.line1 || point.address_details?.street,
-                city: point.address?.line2 || point.address_details?.city,
-                postCode: point.address_details?.post_code
-            });
-            setShowGeoWidget(false);
-        };
-
-        document.addEventListener('inpost.geowidget.point.selected', handlePointSelect);
-        return () => {
-            document.removeEventListener('inpost.geowidget.point.selected', handlePointSelect);
-        };
-    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
