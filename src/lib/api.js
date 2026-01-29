@@ -19,7 +19,7 @@ export async function getCategoryBySlug(slug) {
         .from('categories')
         .select('*')
         .eq('slug', slug)
-        .single();
+        .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -53,7 +53,7 @@ export async function getProductBySlug(slug) {
             variants:product_variants(*)
         `)
         .eq('slug', slug)
-        .single();
+        .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -63,13 +63,22 @@ export async function getProductsByCategory(categorySlug) {
     // Najpierw znajdź kategorię
     const category = await getCategoryBySlug(categorySlug);
 
+    // Jeśli kategoria nie istnieje, zwróć pustą tablicę
+    if (!category) {
+        return [];
+    }
+
     // Pobierz produkty z tej kategorii i podkategorii
     const { data: categories } = await supabase
         .from('categories')
         .select('id')
         .or(`id.eq.${category.id},parent_id.eq.${category.id}`);
 
-    const categoryIds = categories.map(c => c.id);
+    const categoryIds = categories?.map(c => c.id) || [];
+
+    if (categoryIds.length === 0) {
+        return [];
+    }
 
     const { data, error } = await supabase
         .from('products')
@@ -83,7 +92,7 @@ export async function getProductsByCategory(categorySlug) {
         .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data;
+    return data || [];
 }
 
 export async function getFeaturedProducts(limit = 6) {
