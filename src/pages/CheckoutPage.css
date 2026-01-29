@@ -140,3 +140,183 @@
 .btn-full {
     width: 100%;
 }
+
+/* Metody dostawy */
+.delivery-methods {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.delivery-option {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.delivery-option:hover {
+    border-color: #64748b;
+}
+
+.delivery-option.selected {
+    border-color: var(--color-primary);
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+.delivery-icon {
+    font-size: 1.5rem;
+}
+
+.delivery-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.delivery-name {
+    font-weight: 600;
+}
+
+.delivery-price {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+/* Sekcja InPost */
+.inpost-section {
+    margin-top: 15px;
+}
+
+.selected-locker {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0f172a;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+}
+
+.locker-info strong {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--color-primary);
+}
+
+.locker-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+/* Podsumowanie - dostawa */
+.summary-subtotal,
+.summary-delivery {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.summary-delivery {
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 15px;
+}
+
+/* Modal GeoWidget */
+.geowidget-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.geowidget-container {
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 900px;
+    height: 80vh;
+    max-height: 700px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.geowidget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.geowidget-header h3 {
+    margin: 0;
+}
+
+.geowidget-close {
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+}
+
+.geowidget-close:hover {
+    color: var(--color-primary);
+}
+
+inpost-geowidget {
+    flex: 1;
+    display: block;
+}
+
+@media (max-width: 600px) {
+    .delivery-methods {
+        flex-direction: column;
+    }
+
+    .geowidget-container {
+        height: 90vh;
+        max-height: none;
+    }
+}
