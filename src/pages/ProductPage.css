@@ -153,3 +153,94 @@
 .spec-value {
     font-weight: 600;
 }
+
+/* Warianty */
+.variants-block {
+    margin-bottom: 25px;
+}
+
+.variants-block h4 {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-bottom: 10px;
+}
+
+.variants-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.variant-btn {
+    padding: 10px 16px;
+    background-color: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 80px;
+}
+
+.variant-btn:hover {
+    border-color: #64748b;
+}
+
+.variant-btn.selected {
+    border-color: var(--color-primary);
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+.variant-price {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.variant-btn.selected .variant-price {
+    color: var(--color-primary);
+}
+
+/* Kompatybilność */
+.compatibility-block {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+}
+
+.compatibility-block h4 {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+}
+
+.compatibility-block p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Stan magazynowy */
+.stock-info {
+    margin-bottom: 20px;
+}
+
+.in-stock {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.out-of-stock {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

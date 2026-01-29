@@ -23,23 +23,24 @@ const CartPage = ({ cartItems, removeFromCart, updateQuantity }) => {
                     <div className="cart-content">
                         <div className="cart-items">
                             {cartItems.map(item => (
-                                <div key={item.id} className="cart-item">
+                                <div key={item.cartId} className="cart-item">
                                     <div className="item-image">
                                         <img src={item.image} alt={item.name} />
                                     </div>
                                     <div className="item-details">
                                         <h3>{item.name}</h3>
+                                        {item.variantName && <p className="item-variant">Wariant: {item.variantName}</p>}
                                         <p className="item-sku">Kod: {item.sku}</p>
                                     </div>
                                     <div className="item-quantity">
-                                        <button onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}>-</button>
+                                        <button onClick={() => updateQuantity(item.cartId, Math.max(1, item.quantity - 1))}>-</button>
                                         <span>{item.quantity}</span>
-                                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
+                                        <button onClick={() => updateQuantity(item.cartId, item.quantity + 1)}>+</button>
                                     </div>
                                     <div className="item-price">
                                         {formatPrice(item.price * item.quantity)}
                                     </div>
-                                    <button className="remove-btn" onClick={() => removeFromCart(item.id)}>🗑️</button>
+                                    <button className="remove-btn" onClick={() => removeFromCart(item.cartId)}>🗑️</button>
                                 </div>
                             ))}
                         </div>

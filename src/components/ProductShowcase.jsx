@@ -2,12 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './ProductShowcase.css';
 import winterBanner from '../assets/images/banner_winter_tire.png';
-import { products } from '../data/products';
+import { useFeaturedProducts } from '../hooks/useProducts';
 import ProductCard from './ProductCard';
 
 const ProductShowcase = ({ onAddToCart }) => {
-    // Show only 3 items or specific featured items
-    const featuredProducts = products.slice(0, 3);
+    const { products: featuredProducts, loading } = useFeaturedProducts(3);
 
     return (
         <div className="product-showcase">
@@ -31,9 +30,13 @@ const ProductShowcase = ({ onAddToCart }) => {
                     </div>
 
                     <div className="products-grid">
-                        {featuredProducts.map((product, index) => (
-                            <ProductCard key={index} product={product} onAddToCart={onAddToCart} />
-                        ))}
+                        {loading ? (
+                            <p>Ładowanie...</p>
+                        ) : (
+                            featuredProducts.map((product) => (
+                                <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
+                            ))
+                        )}
                     </div>
                 </div>
 

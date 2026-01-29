@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { products } from '../data/products';
+import { useProductsByCategory } from '../hooks/useProducts';
 import ProductCard from '../components/ProductCard';
 import './CategoryPage.css';
 
-const CategoryPage = () => {
+const CategoryPage = ({ onAddToCart }) => {
     const { id } = useParams(); // id is the category slug, e.g., 'hamulce'
+    const { products: categoryProducts, loading, error } = useProductsByCategory(id);
 
-    // Simple filter
-    const categoryProducts = products.filter(p => p.category === id);
+    if (error) {
+        return (
+            <div className="category-page">
+                <div className="container">
+                    <p>Błąd ładowania: {error}</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="category-page">
@@ -41,10 +49,12 @@ const CategoryPage = () => {
                             <span>Znaleziono {categoryProducts.length} produktów</span>
                         </div>
 
-                        {categoryProducts.length > 0 ? (
+                        {loading ? (
+                            <p>Ładowanie produktów...</p>
+                        ) : categoryProducts.length > 0 ? (
                             <div className="category-products-grid">
                                 {categoryProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} onAddToCart={() => alert('Dodano!')} />
+                                    <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
                                 ))}
                             </div>
                         ) : (

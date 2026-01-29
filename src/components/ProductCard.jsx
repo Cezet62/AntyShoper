@@ -7,19 +7,40 @@ const ProductCard = ({ product, onAddToCart }) => {
         return price.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' zł';
     };
 
+    const productUrl = `/produkt/${product.slug || product.id}`;
+
+    // Domyślny wariant (pierwszy) do dodania do koszyka
+    const defaultVariant = product.variants?.[0];
+
+    const handleAddToCart = () => {
+        const cartItem = {
+            id: product.id,
+            variantId: defaultVariant?.id,
+            name: product.name,
+            variantName: defaultVariant?.name,
+            price: product.price,
+            image: product.image,
+            sku: product.sku
+        };
+        onAddToCart(cartItem);
+    };
+
     return (
         <div className="product-card">
-            <Link to={`/produkt/${product.id}`} className="product-image">
+            <Link to={productUrl} className="product-image">
                 <img src={product.image} alt={product.name} />
             </Link>
-            <button className="add-to-cart-btn" onClick={() => onAddToCart(product)}>+</button>
+            <button className="add-to-cart-btn" onClick={handleAddToCart}>+</button>
             <div className="product-details">
-                <Link to={`/produkt/${product.id}`}><h4>{product.name}</h4></Link>
+                <Link to={productUrl}><h4>{product.name}</h4></Link>
                 <p className="product-code">Kod produktu: {product.sku}</p>
                 <div className="product-price">
                     <span className="current-price">{formatPrice(product.price)}</span>
                     {product.oldPrice && <span className="old-price">{formatPrice(product.oldPrice)}</span>}
                 </div>
+                {product.hasVariants && (
+                    <p className="variants-hint">Dostępne warianty</p>
+                )}
             </div>
         </div>
     );

@@ -89,3 +89,9 @@
     text-decoration: line-through;
     color: #ef4444;
 }
+
+.variants-hint {
+    font-size: 0.75rem;
+    color: var(--color-primary);
+    margin-top: 8px;
+}
