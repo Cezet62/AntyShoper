@@ -5,7 +5,7 @@ import './CheckoutPage.css';
 const CheckoutPage = ({ cartItems, clearCart }) => {
     const navigate = useNavigate();
     const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const geoWidgetRef = useRef(null);
+    const geoWidgetContainerRef = useRef(null);
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -29,9 +29,27 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
         document.body.appendChild(script);
 
         return () => {
-            document.body.removeChild(script);
+            if (document.body.contains(script)) {
+                document.body.removeChild(script);
+            }
         };
     }, []);
+
+    // Tworzenie GeoWidget dynamicznie gdy modal jest otwarty
+    useEffect(() => {
+        if (showGeoWidget && geoWidgetContainerRef.current) {
+            // Wyczyść kontener
+            geoWidgetContainerRef.current.innerHTML = '';
+
+            // Utwórz element GeoWidget dynamicznie
+            const widget = document.createElement('inpost-geowidget');
+            widget.setAttribute('token', 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzQlpXVzFNZzVlQnpDYU1XU3JvTlBjRWFveFpXcW9Ua2FuZVB3X291LWxvIn0.eyJleHAiOjIwMzIwNDU4NTMsImlhdCI6MTcxNjY4NTg1MywianRpIjoiZTA0MWI2OTEtMTZhMy00MjMxLWI4MjgtN2E3NWMyN2Q2YjM5IiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5pbnBvc3QucGwvYXV0aC9yZWFsbXMvZXh0ZXJuYWwiLCJzdWIiOiJmOjEyNDc1MDUxLTFjMDMtNGU1OS1iYTBjLTJiNDU2OTdlODUxNzp0R3RwS1NqRDFMSVdXU0tWLWZvLTdvZ2lCNnVKLXdEa0lKYjNBd29kYU5FIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoic2hpcHgiLCJzZXNzaW9uX3N0YXRlIjoiNjUzOTM3YmMtMGJlNC00N2QxLTk1NjctNGU2YWQ2YjQ0ZTk2IiwiYWNyIjoiMSIsInNjb3BlIjoib3BlbmlkIGFwaTphcGlwb2ludHMiLCJzaWQiOiI2NTM5MzdiYy0wYmU0LTQ3ZDEtOTU2Ny00ZTZhZDZiNDRlOTYiLCJhbGxvd2VkX3JlZmVycmVycyI6IiIsInV1aWQiOiI5YTFiNTAzZi1jMGEzLTQxY2MtYjRmNi1iYmU5Mzk5NDQ5YzMifQ.Vz4FwrJd3Cg3yRXZbU5CbLjdM2sN6t5YOd7B8UyWb8cIu4W9X6D2F8EtQvXmLn5P3K4I1HdG0JfR7YmN9AwzQ');
+            widget.setAttribute('language', 'pl');
+            widget.setAttribute('config', 'parcelcollect');
+
+            geoWidgetContainerRef.current.appendChild(widget);
+        }
+    }, [showGeoWidget]);
 
     // Nasłuchiwanie na wybór paczkomatu
     useEffect(() => {
@@ -260,12 +278,7 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
                                 ✕
                             </button>
                         </div>
-                        <inpost-geowidget
-                            ref={geoWidgetRef}
-                            token="eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzQlpXVzFNZzVlQnpDYU1XU3JvTlBjRWFveFpXcW9Ua2FuZVB3X291LWxvIn0.eyJleHAiOjIwMzIwNDU4NTMsImlhdCI6MTcxNjY4NTg1MywianRpIjoiZTA0MWI2OTEtMTZhMy00MjMxLWI4MjgtN2E3NWMyN2Q2YjM5IiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5pbnBvc3QucGwvYXV0aC9yZWFsbXMvZXh0ZXJuYWwiLCJzdWIiOiJmOjEyNDc1MDUxLTFjMDMtNGU1OS1iYTBjLTJiNDU2OTdlODUxNzp0R3RwS1NqRDFMSVdXU0tWLWZvLTdvZ2lCNnVKLXdEa0lKYjNBd29kYU5FIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoic2hpcHgiLCJzZXNzaW9uX3N0YXRlIjoiNjUzOTM3YmMtMGJlNC00N2QxLTk1NjctNGU2YWQ2YjQ0ZTk2IiwiYWNyIjoiMSIsInNjb3BlIjoib3BlbmlkIGFwaTphcGlwb2ludHMiLCJzaWQiOiI2NTM5MzdiYy0wYmU0LTQ3ZDEtOTU2Ny00ZTZhZDZiNDRlOTYiLCJhbGxvd2VkX3JlZmVycmVycyI6IiIsInV1aWQiOiI5YTFiNTAzZi1jMGEzLTQxY2MtYjRmNi1iYmU5Mzk5NDQ5YzMifQ.Vz4FwrJd3Cg3yRXZbU5CbLjdM2sN6t5YOd7B8UyWb8cIu4W9X6D2F8EtQvXmLn5P3K4I1HdG0JfR7YmN9AwzQ"
-                            language="pl"
-                            config="parcelcollect"
-                        ></inpost-geowidget>
+                        <div ref={geoWidgetContainerRef} className="geowidget-wrapper"></div>
                     </div>
                 </div>
             )}

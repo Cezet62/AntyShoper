@@ -305,9 +305,16 @@
     color: var(--color-primary);
 }
 
-inpost-geowidget {
+.geowidget-wrapper {
+    flex: 1;
+    display: flex;
+}
+
+.geowidget-wrapper inpost-geowidget {
     flex: 1;
     display: block;
+    width: 100%;
+    height: 100%;
 }
 
 @media (max-width: 600px) {
