@@ -22,8 +22,8 @@ const Header = ({ cartCount }) => {
             <div className="main-header">
                 <div className="container main-header-content">
                     <Link to="/" className="logo">
-                        <span className="logo-icon">⚙️</span>
-                        <span className="logo-text">CarParts</span>
+                        <img src="/src/assets/images/logo_autopartsdirect.png" alt="AutoPartsDirect" style={{ height: '40px', marginRight: '10px' }} />
+                        <span className="logo-text">AutoPartsDirect</span>
                     </Link>
 
                     <div className="search-bar">
