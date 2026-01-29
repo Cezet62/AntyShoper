@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css';
+import logo from '../assets/images/logo_autopartsdirect.png';
 
 const Header = ({ cartCount }) => {
     return (
@@ -22,7 +23,7 @@ const Header = ({ cartCount }) => {
             <div className="main-header">
                 <div className="container main-header-content">
                     <Link to="/" className="logo">
-                        <img src="/src/assets/images/logo_autopartsdirect.png" alt="AutoPartsDirect" style={{ height: '40px', marginRight: '10px' }} />
+                        <img src={logo} alt="AutoPartsDirect" style={{ height: '40px', marginRight: '10px' }} />
                         <span className="logo-text">AutoPartsDirect</span>
                     </Link>
 
