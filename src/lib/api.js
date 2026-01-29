@@ -127,6 +127,78 @@ export async function searchProducts(query) {
 }
 
 // =============================================
+// ZAMÓWIENIA
+// =============================================
+
+export async function createOrder(orderData) {
+    const { customerData, cartItems, deliveryMethod, deliveryCost, selectedLocker } = orderData;
+
+    // Oblicz sumy
+    const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const total = subtotal + deliveryCost;
+
+    // Przygotuj adres dostawy
+    let shippingAddress = {};
+    if (deliveryMethod === 'inpost' && selectedLocker) {
+        shippingAddress = {
+            type: 'inpost_locker',
+            locker_name: selectedLocker.name,
+            locker_address: selectedLocker.address,
+            locker_city: selectedLocker.city,
+            locker_post_code: selectedLocker.postCode
+        };
+    } else {
+        shippingAddress = {
+            type: 'courier',
+            street: customerData.address,
+            city: customerData.city,
+            post_code: customerData.zipCode
+        };
+    }
+
+    // Utwórz zamówienie
+    const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert([{
+            customer_email: customerData.email,
+            customer_phone: customerData.phone || null,
+            customer_name: `${customerData.firstName} ${customerData.lastName}`,
+            shipping_method: deliveryMethod === 'inpost' ? 'inpost_locker' : 'dpd',
+            shipping_address: shippingAddress,
+            shipping_cost: deliveryCost,
+            payment_method: customerData.paymentMethod,
+            subtotal: subtotal,
+            total: total,
+            status: 'pending',
+            payment_status: 'pending'
+        }])
+        .select()
+        .single();
+
+    if (orderError) throw orderError;
+
+    // Dodaj pozycje zamówienia
+    const orderItems = cartItems.map(item => ({
+        order_id: order.id,
+        product_id: item.id,
+        variant_id: item.variantId || null,
+        product_name: item.name,
+        variant_name: item.variantName || null,
+        quantity: item.quantity,
+        unit_price: item.price,
+        total_price: item.price * item.quantity
+    }));
+
+    const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+    if (itemsError) throw itemsError;
+
+    return order;
+}
+
+// =============================================
 // HELPER: Mapowanie produktu do formatu frontend
 // =============================================
 

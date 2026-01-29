@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createOrder } from '../lib/api';
 import './CheckoutPage.css';
 
 const CheckoutPage = ({ cartItems, clearCart }) => {
@@ -11,6 +12,7 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
         firstName: '',
         lastName: '',
         email: '',
+        phone: '',
         address: '',
         city: '',
         zipCode: '',
@@ -20,6 +22,8 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
     const [deliveryMethod, setDeliveryMethod] = useState('courier');
     const [selectedLocker, setSelectedLocker] = useState(null);
     const [showGeoWidget, setShowGeoWidget] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
 
     // Ładowanie skryptu EasyPack InPost
     useEffect(() => {
@@ -90,8 +94,9 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
         setFormData(prev => ({ ...prev, paymentMethod: method }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
 
         // Walidacja paczkomatu
         if (deliveryMethod === 'inpost' && !selectedLocker) {
@@ -99,11 +104,25 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
             return;
         }
 
-        // Simulate API call
-        setTimeout(() => {
+        setIsSubmitting(true);
+
+        try {
+            const order = await createOrder({
+                customerData: formData,
+                cartItems,
+                deliveryMethod,
+                deliveryCost,
+                selectedLocker
+            });
+
             clearCart();
-            navigate('/sukces');
-        }, 1000);
+            navigate('/sukces', { state: { orderNumber: order.order_number } });
+        } catch (err) {
+            console.error('Order error:', err);
+            setError('Wystąpił błąd podczas składania zamówienia. Spróbuj ponownie.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const formatPrice = (price) => {
@@ -142,9 +161,15 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
                                     <input type="text" name="lastName" required value={formData.lastName} onChange={handleInputChange} />
                                 </div>
                             </div>
-                            <div className="form-group">
-                                <label>Email</label>
-                                <input type="email" name="email" required value={formData.email} onChange={handleInputChange} />
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Email</label>
+                                    <input type="email" name="email" required value={formData.email} onChange={handleInputChange} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Telefon</label>
+                                    <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="Opcjonalnie" />
+                                </div>
                             </div>
                             <div className="form-group">
                                 <label>Adres</label>
@@ -268,7 +293,10 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
                                 <span>Razem:</span>
                                 <span>{formatPrice(totalWithDelivery)}</span>
                             </div>
-                            <button type="submit" className="btn btn-primary btn-full">ZAMAWIAM I PŁACĘ</button>
+                            {error && <div className="checkout-error">{error}</div>}
+                            <button type="submit" className="btn btn-primary btn-full" disabled={isSubmitting}>
+                                {isSubmitting ? 'Przetwarzanie...' : 'ZAMAWIAM I PŁACĘ'}
+                            </button>
                         </div>
                     </div>
 

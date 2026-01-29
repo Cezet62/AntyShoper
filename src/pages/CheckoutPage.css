@@ -317,6 +317,21 @@
     min-height: 500px;
 }
 
+.checkout-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    padding: 12px;
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 @media (max-width: 600px) {
     .delivery-methods {
         flex-direction: column;
