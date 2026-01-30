@@ -15,11 +15,6 @@ const HeroSection = () => {
                 <p className="hero-description">
                     NA WYCIĄGNIĘCIE RĘKI!
                 </p>
-
-                <div className="hero-buttons">
-                    <button className="btn btn-primary">KUP I ZAINSTALUJ</button>
-                    <button className="btn btn-secondary">ZOBACZ DEMO</button>
-                </div>
             </div>
         </section>
     );
