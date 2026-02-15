@@ -2,17 +2,23 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './CategoryGrid.css';
 import engineImg from '../assets/images/category_engine.png';
+import coolingImg from '../assets/images/category_cooling.png';
+import electricalImg from '../assets/images/category_electrical.png';
 import wheelImg from '../assets/images/category_wheel.png';
+import brakesImg from '../assets/images/category_brakes.png';
+import filtersImg from '../assets/images/category_filters.png';
+import exhaustImg from '../assets/images/category_exhaust.png';
+import suspensionImg from '../assets/images/category_suspension.png';
 
 const categories = [
     { name: 'SILNIK', description: 'Mocna strona', image: engineImg, slug: 'silnik' },
-    { name: 'CHŁODZENIE', description: 'Zawsze właściwa temperatura', image: wheelImg, slug: 'chlodzenie' }, // Placeholder
-    { name: 'ELEKTRYKA', description: 'Bezawaryjne działanie', image: engineImg, slug: 'elektryka' }, // Placeholder
+    { name: 'CHŁODZENIE', description: 'Zawsze właściwa temperatura', image: coolingImg, slug: 'chlodzenie' },
+    { name: 'ELEKTRYKA', description: 'Bezawaryjne działanie', image: electricalImg, slug: 'elektryka' },
     { name: 'KOŁA', description: 'Bezpiecznia jazda', image: wheelImg, slug: 'kola' },
-    { name: 'HAMULCE', description: 'Pewne zatrzymanie', image: wheelImg, slug: 'hamulce' }, // Placeholder
-    { name: 'FILTRY', description: 'Czysty silnik', image: engineImg, slug: 'filtry' }, // Placeholder
-    { name: 'WYDECH', description: 'Cicha praca', image: wheelImg, slug: 'wydech' }, // Placeholder
-    { name: 'ZAWIESZENIE', description: 'Komfort jazdy', image: engineImg, slug: 'zawieszenie' }, // Placeholder
+    { name: 'HAMULCE', description: 'Pewne zatrzymanie', image: brakesImg, slug: 'hamulce' },
+    { name: 'FILTRY', description: 'Czysty silnik', image: filtersImg, slug: 'filtry' },
+    { name: 'WYDECH', description: 'Cicha praca', image: exhaustImg, slug: 'wydech' },
+    { name: 'ZAWIESZENIE', description: 'Komfort jazdy', image: suspensionImg, slug: 'zawieszenie' },
 ];
 
 const CategoryGrid = () => {
