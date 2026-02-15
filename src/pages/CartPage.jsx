@@ -53,7 +53,7 @@ const CartPage = ({ cartItems, removeFromCart, updateQuantity }) => {
                             </div>
                             <div className="summary-row">
                                 <span>Dostawa:</span>
-                                <span>0,00 zł</span>
+                                <span style={{ fontSize: '0.85em', color: 'var(--color-text-muted, #94a3b8)' }}>obliczany przy kasie</span>
                             </div>
                             <div className="summary-total">
                                 <span>Do zapłaty:</span>

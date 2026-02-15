@@ -20,7 +20,8 @@ const ProductCard = ({ product, onAddToCart }) => {
             variantName: defaultVariant?.name,
             price: product.price,
             image: product.image,
-            sku: product.sku
+            sku: product.sku,
+            stock: defaultVariant?.stock || 0
         };
         onAddToCart(cartItem);
     };

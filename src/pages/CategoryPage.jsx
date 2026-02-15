@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useProductsByCategory } from '../hooks/useProducts';
+import { getCategoryBySlug } from '../lib/api';
 import ProductCard from '../components/ProductCard';
 import './CategoryPage.css';
 
 const CategoryPage = ({ onAddToCart }) => {
-    const { id } = useParams(); // id is the category slug, e.g., 'hamulce'
+    const { id } = useParams();
     const { products: categoryProducts, loading, error } = useProductsByCategory(id);
+    const [categoryName, setCategoryName] = useState('');
+
+    useEffect(() => {
+        if (!id) return;
+        getCategoryBySlug(id).then(cat => {
+            if (cat) setCategoryName(cat.name);
+        }).catch(() => {});
+    }, [id]);
 
     if (error) {
         return (
@@ -22,7 +31,7 @@ const CategoryPage = ({ onAddToCart }) => {
         <div className="category-page">
             <div className="container">
                 <div className="breadcrumb">
-                    <Link to="/">Strona główna</Link> &gt; <span>{id.toUpperCase()}</span>
+                    <Link to="/">Strona główna</Link> &gt; <span>{categoryName || id.toUpperCase()}</span>
                 </div>
 
                 <div className="category-layout">
@@ -45,7 +54,7 @@ const CategoryPage = ({ onAddToCart }) => {
 
                     <div className="category-content">
                         <div className="category-header">
-                            <h1>Kategoria: {id.toUpperCase()}</h1>
+                            <h1>Kategoria: {categoryName || id.toUpperCase()}</h1>
                             <span>Znaleziono {categoryProducts.length} produktów</span>
                         </div>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -22,26 +22,61 @@ import ProductForm from './pages/admin/ProductForm';
 import Orders from './pages/admin/Orders';
 
 function App() {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('antyshoper-cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('antyshoper-cart', JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const addToCart = (product) => {
+    const cartId = product.variantId ? `${product.id}-${product.variantId}` : product.id;
+    const stock = product.stock || 0;
+    let blocked = false;
+
     setCartItems(prev => {
-      // Unikalne ID = produkt + wariant
-      const cartId = product.variantId ? `${product.id}-${product.variantId}` : product.id;
       const existing = prev.find(item => item.cartId === cartId);
       if (existing) {
         const newQuantity = existing.quantity + (product.quantity || 1);
-        return prev.map(item => item.cartId === cartId ? { ...item, quantity: newQuantity } : item);
+        if (stock > 0 && newQuantity > stock) {
+          blocked = true;
+          return prev;
+        }
+        return prev.map(item => item.cartId === cartId ? { ...item, quantity: newQuantity, stock } : item);
       }
-      return [...prev, { ...product, cartId, quantity: product.quantity || 1 }];
+      const qty = product.quantity || 1;
+      if (stock > 0 && qty > stock) {
+        blocked = true;
+        return [...prev, { ...product, cartId, quantity: stock }];
+      }
+      return [...prev, { ...product, cartId, quantity: qty }];
     });
-    toast.success('Produkt dodany do koszyka!');
+
+    if (blocked) {
+      toast.error(`Maksymalna dostępna ilość: ${stock}`);
+    } else {
+      toast.success('Produkt dodany do koszyka!');
+    }
   };
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const updateQuantity = (cartId, quantity) => {
-    setCartItems(prev => prev.map(item => item.cartId === cartId ? { ...item, quantity } : item));
+    setCartItems(prev => prev.map(item => {
+      if (item.cartId !== cartId) return item;
+      const stock = item.stock || 0;
+      if (stock > 0 && quantity > stock) {
+        toast.error(`Maksymalna dostępna ilość: ${stock}`);
+        return { ...item, quantity: stock };
+      }
+      return { ...item, quantity };
+    }));
   };
 
   const removeFromCart = (cartId) => {

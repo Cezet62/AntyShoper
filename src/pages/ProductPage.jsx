@@ -47,6 +47,7 @@ const ProductPage = ({ onAddToCart }) => {
             price: currentPrice,
             image: product.image,
             sku: currentSku,
+            stock: currentStock,
             quantity: quantity
         };
         onAddToCart(cartItem);

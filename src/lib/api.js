@@ -216,7 +216,7 @@ export function mapProductToFrontend(product) {
         description: product.description,
         price: defaultVariant?.price || 0,
         oldPrice: defaultVariant?.compare_price || null,
-        image: product.images?.[0] || '/placeholder.jpg',
+        image: product.images?.[0] || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect width='400' height='400' fill='%231e293b'/%3E%3Ctext x='200' y='190' text-anchor='middle' fill='%2364748b' font-family='sans-serif' font-size='16'%3EBrak zdj%C4%99cia%3C/text%3E%3Cpath d='M175 230 l15-20 10 12 15-18 20 26z' fill='%2364748b'/%3E%3Ccircle cx='190' cy='218' r='6' fill='%2364748b'/%3E%3C/svg%3E",
         images: product.images || [],
         sku: defaultVariant?.sku || '',
         category: product.category?.slug || '',
