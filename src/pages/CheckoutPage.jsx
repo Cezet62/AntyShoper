@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { createOrder } from '../lib/api';
 import './CheckoutPage.css';
 
@@ -143,6 +144,10 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
 
     return (
         <div className="checkout-page">
+            <Helmet>
+                <title>Zamówienie — AutoPartsDirect</title>
+                <meta name="description" content="Finalizacja zamówienia w AutoPartsDirect." />
+            </Helmet>
             <div className="container">
                 <h1>Kasa</h1>
 

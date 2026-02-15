@@ -8,6 +8,10 @@ import CategoryPage from './pages/CategoryPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import SuccessPage from './pages/SuccessPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import RegulaminPage from './pages/RegulaminPage';
+import PrivacyPage from './pages/PrivacyPage';
 import { Toaster, toast } from 'react-hot-toast';
 
 // Admin
@@ -122,6 +126,10 @@ function App() {
                   <Route path="/koszyk" element={<CartPage cartItems={cartItems} updateQuantity={updateQuantity} removeFromCart={removeFromCart} />} />
                   <Route path="/checkout" element={<CheckoutPage cartItems={cartItems} clearCart={clearCart} />} />
                   <Route path="/sukces" element={<SuccessPage />} />
+                  <Route path="/o-nas" element={<AboutPage />} />
+                  <Route path="/kontakt" element={<ContactPage />} />
+                  <Route path="/regulamin" element={<RegulaminPage />} />
+                  <Route path="/polityka-prywatnosci" element={<PrivacyPage />} />
                 </Routes>
               </main>
               <Footer />

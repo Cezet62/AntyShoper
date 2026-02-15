@@ -1,0 +1,104 @@
+.image-upload-wrapper {
+    width: 100%;
+}
+
+.image-upload-zone {
+    border: 2px dashed #334155;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+    background: #1e293b;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-upload-zone:hover {
+    border-color: #6366f1;
+    background: #1e293b80;
+}
+
+.image-upload-zone.dragging {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.image-upload-zone.uploading {
+    cursor: wait;
+    opacity: 0.8;
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: #94a3b8;
+}
+
+.upload-placeholder svg {
+    color: #64748b;
+}
+
+.upload-placeholder span {
+    font-size: 14px;
+}
+
+.upload-placeholder small {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.image-upload-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.image-upload-preview img {
+    max-width: 200px;
+    max-height: 150px;
+    border-radius: 6px;
+    object-fit: contain;
+}
+
+.upload-hint {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.upload-progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.upload-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #334155;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.image-upload-error {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 6px;
+    color: #ef4444;
+    font-size: 13px;
+}

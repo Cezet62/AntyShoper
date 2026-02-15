@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import ImageUpload from '../../components/ImageUpload';
 import './Admin.css';
 
 export default function CategoryForm() {
@@ -12,6 +13,7 @@ export default function CategoryForm() {
         name: '',
         slug: '',
         description: '',
+        image_url: '',
         parent_id: '',
         sort_order: 0
     });
@@ -50,6 +52,7 @@ export default function CategoryForm() {
             name: data.name || '',
             slug: data.slug || '',
             description: data.description || '',
+            image_url: data.image_url || '',
             parent_id: data.parent_id || '',
             sort_order: data.sort_order || 0
         });
@@ -150,6 +153,15 @@ export default function CategoryForm() {
                         onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                         rows={3}
                         placeholder="Krótki opis kategorii..."
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label>Zdjęcie kategorii</label>
+                    <ImageUpload
+                        onUpload={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+                        folder="categories"
+                        currentImage={formData.image_url || undefined}
                     />
                 </div>
 

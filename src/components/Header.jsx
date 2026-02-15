@@ -1,10 +1,32 @@
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css';
 import logo from '../assets/images/logo_autopartsdirect.png';
+import { getCategories } from '../lib/api';
+import { useProductSearch } from '../hooks/useProducts';
 
 const Header = ({ cartCount }) => {
+    const [categories, setCategories] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showResults, setShowResults] = useState(false);
+    const searchRef = useRef(null);
+    const { products: searchResults, loading: searchLoading } = useProductSearch(searchQuery);
+
+    useEffect(() => {
+        getCategories().then(data => setCategories(data.filter(c => !c.parent_id)));
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (searchRef.current && !searchRef.current.contains(e.target)) {
+                setShowResults(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     return (
         <header className="header">
             <div className="top-bar">
@@ -27,9 +49,45 @@ const Header = ({ cartCount }) => {
                         <span className="logo-text">sklep</span>
                     </Link>
 
-                    <div className="search-bar">
-                        <input type="text" placeholder="Szukaj..." />
+                    <div className="search-bar" ref={searchRef}>
+                        <input
+                            type="text"
+                            placeholder="Szukaj części..."
+                            value={searchQuery}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setShowResults(true);
+                            }}
+                            onFocus={() => searchQuery.length >= 2 && setShowResults(true)}
+                        />
                         <button className="search-btn">🔍</button>
+                        {showResults && searchQuery.length >= 2 && (
+                            <div className="search-dropdown">
+                                {searchLoading ? (
+                                    <div className="search-loading">Szukam...</div>
+                                ) : searchResults.length > 0 ? (
+                                    searchResults.slice(0, 6).map(product => (
+                                        <Link
+                                            key={product.id}
+                                            to={`/produkt/${product.slug}`}
+                                            className="search-result-item"
+                                            onClick={() => {
+                                                setShowResults(false);
+                                                setSearchQuery('');
+                                            }}
+                                        >
+                                            <img src={product.image} alt={product.name} className="search-result-image" />
+                                            <div className="search-result-info">
+                                                <span className="search-result-name">{product.name}</span>
+                                                <span className="search-result-price">{product.price.toFixed(2)} zł</span>
+                                            </div>
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <div className="search-no-results">Brak wyników dla "{searchQuery}"</div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="header-actions">
@@ -61,13 +119,9 @@ const Header = ({ cartCount }) => {
             <nav className="navigation">
                 <div className="container">
                     <ul className="nav-list">
-                        <li><Link to="/kategoria/czesci">CZĘŚCI</Link></li>
-                        <li><Link to="/kategoria/oleje">OLEJE I PŁYNY</Link></li>
-                        <li><Link to="/kategoria/opony">OPONY</Link></li>
-                        <li><Link to="/kategoria/narzedzia">NARZĘDZIA</Link></li>
-                        <li><Link to="/kategoria/akcesoria">AKCESORIA</Link></li>
-                        <li><Link to="/kategoria/promocje">PROMOCJE</Link></li>
-                        <li><Link to="/kategoria/wyprzedaz">WYPRZEDAŻ</Link></li>
+                        {categories.map(cat => (
+                            <li key={cat.id}><Link to={`/kategoria/${cat.slug}`}>{cat.name.toUpperCase()}</Link></li>
+                        ))}
                     </ul>
                 </div>
             </nav>

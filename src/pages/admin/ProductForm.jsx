@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import { deleteImage } from '../../lib/api';
+import ImageUpload from '../../components/ImageUpload';
 import './Admin.css';
 
 export default function ProductForm() {
@@ -25,7 +27,6 @@ export default function ProductForm() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [imageUrl, setImageUrl] = useState('');
 
     useEffect(() => {
         loadCategories();
@@ -130,21 +131,24 @@ export default function ProductForm() {
         setVariants(variants.filter((_, i) => i !== index));
     }
 
-    function addImage() {
-        if (imageUrl && !formData.images.includes(imageUrl)) {
-            setFormData(prev => ({
-                ...prev,
-                images: [...prev.images, imageUrl]
-            }));
-            setImageUrl('');
-        }
+    function handleImageUploaded(url) {
+        setFormData(prev => ({
+            ...prev,
+            images: [...prev.images, url]
+        }));
     }
 
-    function removeImage(index) {
+    async function removeImage(index) {
+        const imageUrl = formData.images[index];
         setFormData(prev => ({
             ...prev,
             images: prev.images.filter((_, i) => i !== index)
         }));
+        try {
+            await deleteImage(imageUrl);
+        } catch (err) {
+            // Image removed from form even if storage delete fails
+        }
     }
 
     async function handleSubmit(e) {
@@ -330,19 +334,10 @@ export default function ProductForm() {
                         ))}
                     </div>
 
-                    <div className="form-row">
-                        <div className="form-group" style={{ flex: 1 }}>
-                            <input
-                                type="url"
-                                value={imageUrl}
-                                onChange={(e) => setImageUrl(e.target.value)}
-                                placeholder="URL zdjęcia"
-                            />
-                        </div>
-                        <button type="button" onClick={addImage} className="btn btn-secondary">
-                            Dodaj zdjęcie
-                        </button>
-                    </div>
+                    <ImageUpload
+                        onUpload={handleImageUploaded}
+                        folder="products"
+                    />
                 </div>
 
                 <div className="form-section">

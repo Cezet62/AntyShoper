@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useProductsByCategory } from '../hooks/useProducts';
 import { getCategoryBySlug } from '../lib/api';
 import ProductCard from '../components/ProductCard';
@@ -29,6 +30,12 @@ const CategoryPage = ({ onAddToCart }) => {
 
     return (
         <div className="category-page">
+            <Helmet>
+                <title>{categoryName ? `${categoryName} — AutoPartsDirect` : 'Kategoria — AutoPartsDirect'}</title>
+                <meta name="description" content={`Części samochodowe z kategorii ${categoryName || 'wybranej'}. Sprawdź ofertę AutoPartsDirect.`} />
+                <meta property="og:title" content={`${categoryName || 'Kategoria'} — AutoPartsDirect`} />
+                <meta property="og:description" content={`Znajdź najlepsze części samochodowe w kategorii ${categoryName || ''}.`} />
+            </Helmet>
             <div className="container">
                 <div className="breadcrumb">
                     <Link to="/">Strona główna</Link> &gt; <span>{categoryName || id.toUpperCase()}</span>

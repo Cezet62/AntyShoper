@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useProduct } from '../hooks/useProducts';
 import './ProductPage.css';
 
@@ -59,6 +60,14 @@ const ProductPage = ({ onAddToCart }) => {
 
     return (
         <div className="product-page">
+            <Helmet>
+                <title>{product.name} — AutoPartsDirect</title>
+                <meta name="description" content={product.description || `Kup ${product.name} w AutoPartsDirect. Najlepsze ceny, szybka dostawa.`} />
+                <meta property="og:title" content={`${product.name} — AutoPartsDirect`} />
+                <meta property="og:description" content={product.description || `${product.name} — sprawdź cenę i dostępność.`} />
+                <meta property="og:image" content={product.image} />
+                <meta property="og:type" content="product" />
+            </Helmet>
             <div className="container">
                 <div className="breadcrumb">
                     <Link to="/">Strona główna</Link>

@@ -234,3 +234,44 @@ export function mapProductToFrontend(product) {
         hasVariants: variants.length > 1
     };
 }
+
+// =============================================
+// STORAGE: Upload i zarządzanie obrazami
+// =============================================
+
+export async function uploadImage(file, folder = 'products') {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+
+    const { data, error } = await supabase
+        .storage
+        .from('product-images')
+        .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+        });
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabase
+        .storage
+        .from('product-images')
+        .getPublicUrl(data.path);
+
+    return publicUrl;
+}
+
+export async function deleteImage(imageUrl) {
+    const url = new URL(imageUrl);
+    const pathParts = url.pathname.split('/storage/v1/object/public/product-images/');
+    if (pathParts.length < 2) return;
+
+    const filePath = pathParts[1];
+
+    const { error } = await supabase
+        .storage
+        .from('product-images')
+        .remove([filePath]);
+
+    if (error) throw error;
+}

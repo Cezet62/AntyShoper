@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /checkout
+Disallow: /koszyk
+
+Sitemap: https://autopartsdirect.pl/sitemap.xml

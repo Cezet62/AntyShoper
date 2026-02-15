@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import './CartPage.css';
 
 const CartPage = ({ cartItems, removeFromCart, updateQuantity }) => {
@@ -11,6 +12,10 @@ const CartPage = ({ cartItems, removeFromCart, updateQuantity }) => {
 
     return (
         <div className="cart-page">
+            <Helmet>
+                <title>Koszyk — AutoPartsDirect</title>
+                <meta name="description" content="Twój koszyk zakupowy w AutoPartsDirect." />
+            </Helmet>
             <div className="container">
                 <h1>Twój Koszyk</h1>
 

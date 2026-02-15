@@ -47,6 +47,7 @@
     flex: 1;
     margin: 0 40px;
     display: flex;
+    position: relative;
 }
 
 .search-bar input {
@@ -96,4 +97,63 @@
 
 .nav-list a:hover {
     color: var(--color-accent);
+}
+
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    gap: 12px;
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.search-result-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.search-result-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.search-result-name {
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+.search-result-price {
+    font-size: 0.85rem;
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+.search-loading,
+.search-no-results {
+    padding: 15px;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
 }
