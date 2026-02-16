@@ -124,8 +124,8 @@ function App() {
                   <Route path="/kategoria/:id" element={<CategoryPage onAddToCart={addToCart} />} />
                   <Route path="/produkt/:slug" element={<ProductPage onAddToCart={addToCart} />} />
                   <Route path="/koszyk" element={<CartPage cartItems={cartItems} updateQuantity={updateQuantity} removeFromCart={removeFromCart} />} />
-                  <Route path="/checkout" element={<CheckoutPage cartItems={cartItems} clearCart={clearCart} />} />
-                  <Route path="/sukces" element={<SuccessPage />} />
+                  <Route path="/checkout" element={<CheckoutPage cartItems={cartItems} />} />
+                  <Route path="/sukces" element={<SuccessPage clearCart={clearCart} />} />
                   <Route path="/o-nas" element={<AboutPage />} />
                   <Route path="/kontakt" element={<ContactPage />} />
                   <Route path="/regulamin" element={<RegulaminPage />} />

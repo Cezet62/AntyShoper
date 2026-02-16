@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import toast from 'react-hot-toast';
 import { createOrder } from '../lib/api';
 import './CheckoutPage.css';
 
-const CheckoutPage = ({ cartItems, clearCart }) => {
+const CheckoutPage = ({ cartItems }) => {
     const navigate = useNavigate();
     const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const geoWidgetContainerRef = useRef(null);
@@ -108,6 +109,7 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
         setIsSubmitting(true);
 
         try {
+            // 1. Utwórz zamówienie w Supabase (status: pending)
             const order = await createOrder({
                 customerData: formData,
                 cartItems,
@@ -116,11 +118,43 @@ const CheckoutPage = ({ cartItems, clearCart }) => {
                 selectedLocker
             });
 
-            clearCart();
-            navigate('/sukces', { state: { orderNumber: order.order_number } });
+            // 2. Utwórz sesję Stripe Checkout
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+            const response = await fetch(
+                `${supabaseUrl}/functions/v1/create-checkout-session`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseAnonKey}`,
+                    },
+                    body: JSON.stringify({
+                        orderId: order.id,
+                        items: cartItems.map(item => ({
+                            name: item.name + (item.variantName ? ` - ${item.variantName}` : ''),
+                            price: item.price,
+                            quantity: item.quantity,
+                        })),
+                        shippingCost: deliveryCost,
+                        customerEmail: formData.email,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.url) {
+                throw new Error(data.error || 'Nie udało się utworzyć sesji płatności');
+            }
+
+            // 3. Redirect na stronę Stripe (koszyk czyszczony po powrocie na /sukces)
+            window.location.href = data.url;
         } catch (err) {
             console.error('Order error:', err);
             setError('Wystąpił błąd podczas składania zamówienia. Spróbuj ponownie.');
+            toast.error('Błąd płatności. Spróbuj ponownie.');
         } finally {
             setIsSubmitting(false);
         }
