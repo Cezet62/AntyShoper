@@ -1,6 +1,7 @@
 # AUDYT PROJEKTU: AntyShoper (AutoPartsDirect)
 
 **Data audytu:** 2026-02-15
+**Ostatnia aktualizacja:** 2026-02-16 (płatności Stripe)
 **Produkcja:** https://anty-shoper.vercel.app/
 **Admin panel:** https://anty-shoper.vercel.app/admin/login
 
@@ -16,32 +17,36 @@
 | Build tool | Vite | 7.2.4 |
 | Routing | react-router-dom | 7.13.0 |
 | Backend/DB | Supabase (PostgreSQL) | 2.93.3 |
+| SEO | react-helmet-async | 2.0.5 |
+| Płatności | Stripe Checkout (P24/BLIK/karty) | 14 |
+| Edge Functions | Supabase Edge Functions (Deno) | - |
 | Notyfikacje | react-hot-toast | 2.6.0 |
 | Styling | CSS (custom properties) | - |
 | Hosting | Vercel (SPA rewrite) | - |
 
-**UWAGA:** Projekt NIE używa Next.js. Jest to klasyczne SPA (Single Page Application) na React + Vite, z client-side routingiem. Vercel serwuje `index.html` dla wszystkich ścieżek (konfiguracja w `vercel.json`).
+**UWAGA:** Projekt NIE używa Next.js. Jest to klasyczne SPA (Single Page Application) na React + Vite, z client-side routingiem. Vercel serwuje `index.html` dla wszystkich ścieżek (konfiguracja w `vercel.json`). Plik `.npmrc` z `legacy-peer-deps=true` rozwiązuje konflikt peer dependencies react-helmet-async z React 19.
 
 ### Struktura plików
 
 ```
 src/
-├── App.jsx                    # Router + stan koszyka
-├── main.jsx                   # Entry point + ErrorBoundary
+├── App.jsx                    # Router + stan koszyka (localStorage)
+├── main.jsx                   # Entry point + ErrorBoundary + HelmetProvider
 ├── index.css                  # Globalne style + CSS variables
 ├── App.css                    # NIEUŻYWANY (resztki szablonu Vite)
 │
-├── assets/images/             # 6 obrazków (logo, hero, kategorie, banner, produkt)
+├── assets/images/             # 12 obrazków (logo, hero, 8x kategorie, banner, produkt)
 │
-├── components/                # Komponenty UI
-│   ├── Header.jsx/.css        # Nawigacja, search, koszyk
-│   ├── Footer.jsx/.css        # Stopka
+├── components/
+│   ├── Header.jsx/.css        # Nawigacja dynamiczna, wyszukiwarka z dropdown, koszyk
+│   ├── Footer.jsx/.css        # Stopka z linkami do stron informacyjnych
 │   ├── HeroSection.jsx/.css   # Baner główny
 │   ├── FeaturesBar.jsx/.css   # Pasek USP (zwroty, wysyłka, jakość)
-│   ├── BrandSelector.jsx/.css # Selektor marek aut
-│   ├── CategoryGrid.jsx/.css  # Siatka kategorii
+│   ├── BrandSelector.jsx/.css # Selektor marek aut (dekoracyjny)
+│   ├── CategoryGrid.jsx/.css  # Siatka kategorii -- dynamiczna z API
 │   ├── ProductCard.jsx/.css   # Karta produktu
 │   ├── ProductShowcase.jsx/.css # Promocje + produkty wyróżnione
+│   ├── ImageUpload.jsx/.css   # Upload obrazków do Supabase Storage (drag & drop)
 │   └── ErrorBoundary.jsx      # Przechwytywanie błędów React
 │
 ├── contexts/
@@ -53,18 +58,33 @@ src/
 │
 ├── lib/
 │   ├── supabase.js            # Inicjalizacja klienta Supabase
-│   └── api.js                 # Funkcje API: CRUD kategorii, produktów, zamówień
+│   └── api.js                 # Funkcje API: CRUD kategorii, produktów, zamówień,
+│                              #   uploadImage, deleteImage
+│
+supabase/
+├── config.toml                # Konfiguracja Supabase CLI
+├── schema.sql                 # Schemat bazy danych
+├── seed.sql                   # Dane testowe
+├── migrations/                # Migracje SQL
+└── functions/
+    ├── create-checkout-session/index.ts  # Edge Function: tworzy sesję Stripe Checkout
+    └── stripe-webhook/index.ts           # Edge Function: odbiera webhook Stripe → aktualizuje zamówienie
 │
 ├── data/
 │   └── products.js            # NIEUŻYWANY mock data (6 produktów)
 │
 └── pages/
-    ├── HomePage.jsx           # Strona główna (kompozycja komponentów)
-    ├── CategoryPage.jsx/.css  # Lista produktów w kategorii + filtry (nieaktywne)
-    ├── ProductPage.jsx/.css   # Strona produktu z wariantami
-    ├── CartPage.jsx/.css      # Koszyk
-    ├── CheckoutPage.jsx/.css  # Checkout z InPost GeoWidget
+    ├── HomePage.jsx           # Strona główna + SEO Helmet
+    ├── CategoryPage.jsx/.css  # Lista produktów w kategorii + SEO
+    ├── ProductPage.jsx/.css   # Strona produktu z wariantami + SEO
+    ├── CartPage.jsx/.css      # Koszyk + SEO
+    ├── CheckoutPage.jsx/.css  # Checkout z InPost GeoWidget + SEO
     ├── SuccessPage.jsx/.css   # Potwierdzenie zamówienia
+    ├── AboutPage.jsx          # O nas
+    ├── ContactPage.jsx        # Kontakt (formularz frontend-only)
+    ├── RegulaminPage.jsx      # Regulamin sklepu
+    ├── PrivacyPage.jsx        # Polityka prywatności (RODO)
+    ├── InfoPage.css           # Wspólne style stron informacyjnych
     │
     └── admin/
         ├── Admin.css          # Style panelu admin
@@ -72,10 +92,14 @@ src/
         ├── AdminLayout.jsx    # Layout z sidebarrem + guard auth
         ├── Dashboard.jsx      # Statystyki
         ├── Categories.jsx     # Lista kategorii
-        ├── CategoryForm.jsx   # Formularz kategorii (CRUD)
+        ├── CategoryForm.jsx   # Formularz kategorii + upload obrazka
         ├── Products.jsx       # Lista produktów
-        ├── ProductForm.jsx    # Formularz produktu + warianty (CRUD)
+        ├── ProductForm.jsx    # Formularz produktu + warianty + upload obrazków
         └── Orders.jsx         # Lista zamówień + zmiana statusu
+
+public/
+├── robots.txt                 # SEO: blokuje /admin/, /checkout, /koszyk
+└── sitemap.xml                # SEO: statyczny sitemap (5 głównych stron)
 ```
 
 ### Schemat bazy danych (Supabase)
@@ -116,17 +140,21 @@ orders                        order_items
 
 | Ścieżka | Komponent | Status |
 |----------|-----------|--------|
-| `/` | HomePage | Działa |
-| `/kategoria/:slug` | CategoryPage | Działa |
-| `/produkt/:slug` | ProductPage | Działa |
-| `/koszyk` | CartPage | Działa |
-| `/checkout` | CheckoutPage | Działa (bez płatności) |
-| `/sukces` | SuccessPage | Działa |
-| `/admin/login` | AdminLogin | Działa |
-| `/admin` | Dashboard | Działa (chronione) |
-| `/admin/kategorie` | Categories | Działa (CRUD) |
-| `/admin/produkty` | Products | Działa (CRUD) |
-| `/admin/zamowienia` | Orders | Działa |
+| `/` | HomePage | ✅ Działa + SEO |
+| `/kategoria/:slug` | CategoryPage | ✅ Działa + SEO |
+| `/produkt/:slug` | ProductPage | ✅ Działa + SEO |
+| `/koszyk` | CartPage | ✅ Działa + SEO |
+| `/checkout` | CheckoutPage | ✅ Działa + SEO + Stripe redirect |
+| `/sukces` | SuccessPage | ✅ Działa + obsługa powrotu ze Stripe |
+| `/o-nas` | AboutPage | ✅ Działa |
+| `/kontakt` | ContactPage | ✅ Działa (formularz frontend-only) |
+| `/regulamin` | RegulaminPage | ✅ Działa |
+| `/polityka-prywatnosci` | PrivacyPage | ✅ Działa |
+| `/admin/login` | AdminLogin | ✅ Działa |
+| `/admin` | Dashboard | ✅ Działa (chronione) |
+| `/admin/kategorie` | Categories | ✅ Działa (CRUD) |
+| `/admin/produkty` | Products | ✅ Działa (CRUD + upload) |
+| `/admin/zamowienia` | Orders | ✅ Działa |
 | `/login` | - | **BRAK** (link w Header) |
 | `/wishlist` | - | **BRAK** (link w Header) |
 | `/account` | - | **BRAK** (link w Header) |
@@ -139,51 +167,88 @@ orders                        order_items
 
 - **Panel administracyjny** -- kompletny z autentykacją Supabase Auth
   - Dashboard z live statystykami (produkty, kategorie, zamówienia, oczekujące)
-  - CRUD kategorii z hierarchią (parent/child)
-  - CRUD produktów z wieloma wariantami (cena, SKU, stan magazynowy, atrybuty JSONB)
+  - CRUD kategorii z hierarchią (parent/child) + upload obrazka
+  - CRUD produktów z wieloma wariantami (cena, SKU, stan magazynowy, atrybuty JSONB) + upload wielu obrazków
   - Lista zamówień z filtrowaniem po statusie i zmianą statusu
   - Auto-generowanie slugów z polskimi znakami
   - Toggle aktywności produktów
+  - Komponent ImageUpload z drag & drop, resize do 1024px, walidacja 10MB
 
 - **Strona produktu** (`ProductPage.jsx`) -- kompletna
   - Selektor wariantów z dynamiczną ceną i SKU
   - Informacja o stanie magazynowym per wariant
   - Breadcrumb nawigacja
   - Informacje o kompatybilności (pasuje do jakich aut)
-  - Ilość + dodaj do koszyka
+  - Ilość + dodaj do koszyka z walidacją stocku
+  - SEO meta tagi (dynamiczny title, description, og:image)
 
 - **Koszyk** (`CartPage.jsx`) -- kompletny
   - Dodawanie produktów z wariantami (unikalne ID: `productId-variantId`)
-  - Zmiana ilości, usuwanie pozycji
+  - Zmiana ilości z walidacją stanu magazynowego, toast z limitem
+  - Usuwanie pozycji
+  - Persystencja w localStorage (klucz: `antyshoper-cart`)
+  - Koszt dostawy: "obliczany przy kasie"
   - Podsumowanie cenowe
 
-- **Checkout** (`CheckoutPage.jsx`) -- kompletny (flow, bez bramki płatności)
+- **Checkout + Płatności** (`CheckoutPage.jsx`) -- kompletny z bramką płatności
   - Formularz danych klienta
   - Wybór metody dostawy: Kurier DPD (14,99 zł) lub Paczkomat InPost (9,99 zł)
   - Integracja InPost EasyPack GeoWidget (mapa do wyboru paczkomatu)
-  - Wybór metody płatności (UI only)
-  - Tworzenie zamówienia w Supabase
-  - Redirect na stronę sukcesu z numerem zamówienia
+  - Tworzenie zamówienia w Supabase (status: pending)
+  - Redirect na Stripe Checkout z metodami: Przelewy24, BLIK, karty
+  - Obsługa błędów (toast notification)
+
+- **Stripe Checkout** -- kompletna integracja płatności
+  - Supabase Edge Function `create-checkout-session`: tworzy sesję Stripe z line_items (produkty + dostawa), P24/BLIK/karty, locale PL, waluta PLN
+  - Supabase Edge Function `stripe-webhook`: odbiera eventy `checkout.session.completed` / `expired`, aktualizuje `payment_status` i `payment_id` w Supabase (service_role bypass RLS)
+  - SuccessPage: parsuje `session_id` z URL, pobiera `order_number` z DB, czyści koszyk
+  - CORS dla produkcji (`anty-shoper.vercel.app`) i localhost
+  - Kwoty w groszach (PLN × 100), dostawa jako osobna pozycja
+
+- **Wyszukiwarka** -- działająca w Header
+  - Hook `useProductSearch` z debounce 300ms
+  - Dropdown z wynikami (max 6)
+  - Wyszukiwanie po nazwie, opisie i tagach kompatybilności
+
+- **Dynamiczne kategorie**
+  - Header: nawigacja zaciągana z API
+  - CategoryGrid: kategorie z API z fallback na lokalne obrazki
+  - Breadcrumb z prawdziwą nazwą kategorii z DB
+
+- **Strony informacyjne** -- kompletne
+  - O nas (`/o-nas`) -- sekcje: firma, eksperci, misja, wartości
+  - Kontakt (`/kontakt`) -- formularz + dane kontaktowe (formularz frontend-only)
+  - Regulamin (`/regulamin`) -- pełne warunki sprzedaży
+  - Polityka prywatności (`/polityka-prywatnosci`) -- zgodna z RODO
+
+- **SEO**
+  - react-helmet-async na wszystkich stronach sklepowych
+  - Dynamiczne title, meta description, Open Graph per strona
+  - robots.txt (blokuje admin, checkout, koszyk)
+  - sitemap.xml (statyczny -- 5 głównych stron)
 
 - **API layer** (`lib/api.js`) -- kompletny
   - CRUD kategorii i produktów
   - Wyszukiwanie pełnotekstowe (ilike)
   - Tworzenie zamówień z pozycjami
+  - Upload/delete obrazków (Supabase Storage)
   - Mapowanie danych Supabase → frontend
 
 - **Custom hooks** (`hooks/useProducts.js`) -- 5 hooków z loading/error states i debounce
 
 - **Baza danych** -- pełny schemat z RLS, triggerami, indeksami, seed data
 
-- **Deploy** -- Vercel z poprawną konfiguracją SPA
+- **Deploy** -- Vercel z poprawną konfiguracją SPA + .npmrc dla React 19
 
-### Komponenty UI -- gotowe wizualnie
+### Komponenty UI -- gotowe
 
-- Header z logo, nawigacją i badge'em koszyka
-- Footer z sekcjami (informacje, konto, kontakt)
+- Header z logo, dynamiczną nawigacją, wyszukiwarką i badge'em koszyka
+- Footer z linkami do stron informacyjnych
 - HeroSection z banerem i gradientem
 - FeaturesBar (USP: zwroty, wysyłka, jakość)
+- CategoryGrid z 8 dedykowanymi obrazkami kategorii
 - ProductCard z ceną, starą ceną, wariantem
+- ImageUpload z drag & drop i podglądem
 - ErrorBoundary (przechwytywanie błędów React)
 - Toast notifications (react-hot-toast)
 
@@ -191,33 +256,22 @@ orders                        order_items
 
 ## 3. CO JEST ZACZĘTE ALE NIEDOKOŃCZONE
 
-### Wysoki priorytet
-
-| Element | Plik | Problem |
-|---------|------|---------|
-| **Wyszukiwarka** | `Header.jsx:31` | Input bez `onChange`, brak obsługi. Hook `useProductSearch` istnieje i działa, ale nie jest podłączony do UI |
-| **Filtry kategorii** | `CategoryPage.jsx:29-43` | Sidebar z filtrami (cena, marka) -- czysty HTML bez logiki. Checkboxy i input'y nie robią nic. Przycisk "Filtruj" bez onClick |
-| **Selektor marek** | `BrandSelector.jsx` | 11 hardcoded marek z placeholder logo (pierwsza litera). Kliknięcie nie filtruje produktów |
-| **Nawigacja kategorii** | `Header.jsx:63-71` | 7 hardcoded linków nawigacji (CZĘŚCI, OLEJE, OPONY...). Powinny być dynamiczne z API |
-| **Siatka kategorii** | `CategoryGrid.jsx:7-16` | 8 kategorii hardcoded. 6 z 8 oznaczonych `// Placeholder` -- używa tylko 2 obrazków dla 8 kategorii |
-| **Carousel** | `ProductShowcase.jsx:27-28` | Przyciski `<` i `>` bez logiki -- statyczna siatka 3 produktów |
-
 ### Średni priorytet
 
 | Element | Plik | Problem |
 |---------|------|---------|
-| **Koszyk -- brak persystencji** | `App.jsx:25` | `useState([])` -- koszyk ginie po odświeżeniu strony |
-| **Koszyk -- dostawa** | `CartPage.jsx:56` | Hardcoded "0,00 zł" jako koszt dostawy, checkout pokazuje 9.99/14.99 |
-| **Koszyk -- brak limitu ilości** | `CartPage.jsx:38` | `quantity + 1` bez sprawdzenia stanu magazynowego |
-| **Breadcrumb w kategorii** | `CategoryPage.jsx:25` | Wyświetla slug uppercase (`HAMULCE`) zamiast nazwy kategorii z DB |
-| **Fallback image** | `api.js:219` | Odniesienie do `/placeholder.jpg` -- plik nie istnieje w `public/` |
+| **Filtry kategorii** | `CategoryPage.jsx` | Sidebar z filtrami (cena, marka) -- czysty HTML bez logiki. Checkboxy i input'y nie robią nic. Przycisk "Filtruj" bez onClick |
+| **Selektor marek** | `BrandSelector.jsx` | 11 hardcoded marek z placeholder logo (pierwsza litera). Kliknięcie nie filtruje produktów |
+| **Carousel** | `ProductShowcase.jsx:27-28` | Przyciski `<` i `>` bez logiki -- statyczna siatka 3 produktów |
+| **Formularz kontaktowy** | `ContactPage.jsx` | Frontend-only -- pokazuje alert po wysłaniu, brak integracji z emailem |
+| **Sitemap** | `public/sitemap.xml` | Statyczny -- nie zawiera dynamicznych URL kategorii i produktów |
 
 ### Niski priorytet
 
 | Element | Plik | Problem |
 |---------|------|---------|
-| **Footer linki** | `Footer.jsx:17-32` | Wszystkie linki to `href="#"` -- O nas, Kontakt, Regulamin, Polityka prywatności, Logowanie, Rejestracja, Historia zamówień |
-| **Header linki** | `Header.jsx:18,36,37` | Linki do `/login`, `/wishlist`, `/account` -- trasy nie istnieją |
+| **Header linki** | `Header.jsx` | Linki do `/login`, `/wishlist`, `/account` -- trasy nie istnieją |
+| **Footer -- sekcja konto** | `Footer.jsx` | Logowanie, Rejestracja, Historia zamówień -- `href="#"` (brak stron klienta) |
 | **Nieużywany plik** | `src/data/products.js` | Legacy mock data (6 produktów), nie jest importowany nigdzie |
 | **Nieużywany plik** | `src/App.css` | Resztki szablonu Vite (animacja logo), nie jest używany |
 
@@ -229,55 +283,43 @@ orders                        order_items
 
 | # | Funkcja | Opis | Wysiłek |
 |---|---------|------|---------|
-| 1 | **Bramka płatności** | Integracja Przelewy24/Stripe/BLIK. Obecnie checkout tworzy zamówienie ze statusem "pending" ale nie pobiera płatności. Potrzebna Supabase Edge Function lub zewnętrzny endpoint | Duży |
-| 2 | **Persystencja koszyka** | Zapis koszyka do `localStorage` żeby nie ginął po odświeżeniu | Mały |
-| 3 | **Placeholder image** | Dodać plik `/public/placeholder.jpg` lub naprawić fallback w `mapProductToFrontend` | Mały |
+| ~~1~~ | ~~**Bramka płatności**~~ | ✅ **ZROBIONE** -- Stripe Checkout z P24/BLIK/kartami via Supabase Edge Functions | ~~Duży~~ |
 
 ### Ważne (kompletny sklep)
 
 | # | Funkcja | Opis | Wysiłek |
 |---|---------|------|---------|
-| 4 | **Wyszukiwarka w Header** | Podłączyć istniejący hook `useProductSearch` do inputa w Header. Wyświetlić dropdown z wynikami | Średni |
-| 5 | **Filtry kategorii** | Implementacja filtrowania po cenie i marce na CategoryPage | Średni |
-| 6 | **Strony informacyjne** | Regulamin, Polityka prywatności, O nas, Kontakt (z formularzem) | Średni |
-| 7 | **Potwierdzenie email** | Wysyłka emaila po złożeniu zamówienia (Resend/SendGrid) | Średni |
-| 8 | **Upload obrazków** | Obecnie admin wpisuje URL -- potrzebny upload do Supabase Storage | Średni |
-| 9 | **Kategorie dynamiczne** | Nawigacja w Header i CategoryGrid z API zamiast hardcoded | Mały |
-| 10 | **SEO / Meta tagi** | Brak `<title>`, `<meta description>`, Open Graph. SPA potrzebuje pre-renderingu lub SSR dla SEO | Duży |
+| 2 | **Filtry kategorii** | Implementacja filtrowania po cenie i marce na CategoryPage | Średni |
+| 3 | **Potwierdzenie email** | Wysyłka emaila po złożeniu zamówienia (Resend/SendGrid) | Średni |
+| 4 | **Backend formularza kontaktowego** | Email z formularza kontaktowego (Edge Function + Resend) | Mały |
+| 5 | **Dynamiczny sitemap** | Generowanie sitemap z URL kategorii i produktów | Mały |
 
 ### Nice-to-have (profesjonalny sklep)
 
 | # | Funkcja | Opis | Wysiłek |
 |---|---------|------|---------|
-| 11 | **Konta klientów** | Rejestracja, logowanie, historia zamówień, profil | Duży |
-| 12 | **Śledzenie zamówień** | Strona statusu zamówienia dla klienta (po numerze + email) | Średni |
-| 13 | **Panel zamówień -- detale** | Podgląd szczegółów zamówienia w adminie (pozycje, adres, locker) | Mały |
-| 14 | **InPost ShipX** | Tworzenie przesyłek InPost z panelu admin (Edge Function) | Duży |
-| 15 | **Faktury PDF** | Generowanie faktur/paragonów | Średni |
-| 16 | **Newsletter** | Zapis na newsletter, kampanie email | Średni |
-| 17 | **Opinie produktów** | Recenzje klientów przy produktach | Średni |
-| 18 | **Porównywarka** | Porównanie specyfikacji produktów | Średni |
-| 19 | **Logo marek** | Prawdziwe logo marek zamiast placeholder liter | Mały |
-| 20 | **Carousel produktów** | Działające przewijanie w ProductShowcase | Mały |
+| 6 | **Konta klientów** | Rejestracja, logowanie, historia zamówień, profil | Duży |
+| 7 | **Śledzenie zamówień** | Strona statusu zamówienia dla klienta (po numerze + email) | Średni |
+| 8 | **Panel zamówień -- detale** | Podgląd szczegółów zamówienia w adminie (pozycje, adres, locker) | Mały |
+| 9 | **InPost ShipX** | Tworzenie przesyłek InPost z panelu admin (Edge Function) | Duży |
+| 10 | **Faktury PDF** | Generowanie faktur/paragonów | Średni |
+| 11 | **Newsletter** | Zapis na newsletter, kampanie email | Średni |
+| 12 | **Opinie produktów** | Recenzje klientów przy produktach | Średni |
+| 13 | **Logo marek** | Prawdziwe logo marek zamiast placeholder liter w BrandSelector | Mały |
+| 14 | **Carousel produktów** | Działające przewijanie w ProductShowcase | Mały |
+| 15 | **Strona 404** | Dedykowana strona dla nieistniejących ścieżek | Mały |
 
 ---
 
 ## 5. PROBLEMY I BŁĘDY
 
-### Błędy krytyczne
-
-Brak krytycznych błędów runtime. Kod jest technicznie poprawny i działa.
-
 ### Problemy funkcjonalne
 
 | Priorytet | Problem | Lokalizacja | Opis |
 |-----------|---------|-------------|------|
-| WYSOKI | Koszyk ginie po refresh | `App.jsx:25` | `useState([])` bez persystencji. Klient traci koszyk po odświeżeniu strony |
-| WYSOKI | Brak walidacji stocku w koszyku | `CartPage.jsx:38` | Można dodać więcej sztuk niż jest na stanie |
-| ŚREDNI | Broken image fallback | `api.js:219` | `/placeholder.jpg` nie istnieje -- produkty bez obrazków pokażą broken image |
-| ŚREDNI | Brak walidacji formularza | `CheckoutPage.jsx` | Tylko HTML5 `required` i `type="email"`. Brak walidacji kodu pocztowego, telefonu, min. długości |
-| NISKI | Delivery "0,00 zł" w koszyku | `CartPage.jsx:56` | Mylące -- checkout liczy 9.99 lub 14.99 zł |
-| NISKI | Kategoria w breadcrumb | `CategoryPage.jsx:25` | Wyświetla slug (`HAMULCE`) zamiast prawdziwej nazwy kategorii |
+| ŚREDNI | Brak walidacji formularza checkout | `CheckoutPage.jsx` | Tylko HTML5 `required` i `type="email"`. Brak walidacji kodu pocztowego, telefonu, min. długości |
+| NISKI | Formularz kontaktowy bez backendu | `ContactPage.jsx` | Formularz pokazuje alert, ale nie wysyła emaila |
+| NISKI | Statyczny sitemap | `public/sitemap.xml` | Brak dynamicznych URL produktów i kategorii |
 
 ### Problemy z nawigacją
 
@@ -286,13 +328,9 @@ Brak krytycznych błędów runtime. Kod jest technicznie poprawny i działa.
 | "Zaloguj się" | Header | Link do `/login` -- trasa nie istnieje |
 | Wishlist (serce) | Header | Link do `/wishlist` -- trasa nie istnieje |
 | Account (osoba) | Header | Link do `/account` -- trasa nie istnieje |
-| O nas | Footer | `href="#"` -- nie prowadzi nigdzie |
-| Kontakt | Footer | `href="#"` -- nie prowadzi nigdzie |
-| Regulamin | Footer | `href="#"` -- nie prowadzi nigdzie |
-| Polityka prywatności | Footer | `href="#"` -- nie prowadzi nigdzie |
-| Logowanie | Footer | `href="#"` -- nie prowadzi nigdzie |
-| Rejestracja | Footer | `href="#"` -- nie prowadzi nigdzie |
-| Historia zamówień | Footer | `href="#"` -- nie prowadzi nigdzie |
+| Logowanie | Footer | `href="#"` -- brak strony klienta |
+| Rejestracja | Footer | `href="#"` -- brak strony klienta |
+| Historia zamówień | Footer | `href="#"` -- brak strony klienta |
 
 ### Nieużywane pliki (do usunięcia)
 
@@ -310,176 +348,144 @@ Brak krytycznych błędów runtime. Kod jest technicznie poprawny i działa.
 - ErrorBoundary na najwyższym poziomie
 - Spójne nazewnictwo (camelCase w kodzie, polski UI)
 - Dobre separation of concerns (hooks, components, api, pages)
-- `console.error` tylko w catch (6 wystąpień) -- poprawne użycie
+- `console.error` tylko w catch -- poprawne użycie
 - Poprawne formatowanie cen (locale pl-PL)
+- SEO Helmet na wszystkich stronach sklepowych
 
 ---
 
 ## 6. PLAN DZIAŁANIA
 
-### FAZA 1: MVP -- Przyjęcie pierwszego zamówienia
-
-**Cel: Klient może złożyć i opłacić zamówienie.**
-
-#### Zadania SEKWENCYJNE (muszą być po kolei):
+### FAZA 1: Quick fixy UX ✅ UKOŃCZONA
 
 ```
-1. Persystencja koszyka (localStorage)
-   └─ Zależy od: nic
-   └─ Blokuje: nic, ale kluczowy UX
-
-2. Bramka płatności -- backend
-   └─ Supabase Edge Function lub webhook
-   └─ Integracja Stripe/Przelewy24
-   └─ Endpoint: create-payment-intent, webhook-handler
-   └─ Zależy od: nic
-   └─ Blokuje: krok 3
-
-3. Bramka płatności -- frontend
-   └─ Redirect do płatności po createOrder
-   └─ Obsługa callback (success/failure)
-   └─ Update statusu zamówienia
-   └─ Zależy od: krok 2
+✅ Persystencja koszyka (localStorage)
+✅ Fix placeholder image (inline SVG)
+✅ Fix delivery cost w CartPage ("obliczany przy kasie")
+✅ Fix walidacja stocku w koszyku (toast z limitem)
+✅ Breadcrumb z nazwą kategorii z DB
+✅ Dedykowane obrazki dla 8 kategorii (zastąpienie placeholderów)
 ```
 
-#### Zadania RÓWNOLEGŁE (niezależne, mogą być robione jednocześnie):
+### FAZA 2: Kompletny sklep ✅ UKOŃCZONA
 
 ```
-A. Placeholder image fix
-   └─ Dodać /public/placeholder.jpg LUB zamienić fallback na inline SVG
-
-B. Walidacja stocku w koszyku
-   └─ Sprawdzenie max quantity przy dodawaniu i aktualizacji
-
-C. Poprawa kosztu dostawy w CartPage
-   └─ Zamiast "0,00 zł" → "obliczany przy kasie" lub dynamiczna kalkulacja
+✅ Dynamiczne kategorie w nawigacji (Header + CategoryGrid z API)
+✅ Wyszukiwarka w Header (dropdown z wynikami, debounce)
+✅ Strony informacyjne (O nas, Kontakt, Regulamin, Polityka prywatności)
+✅ Podłączenie linków w Footer do nowych stron
+✅ Upload obrazków do Supabase Storage (drag & drop, resize, delete)
+✅ SEO: react-helmet-async na wszystkich stronach
+✅ SEO: robots.txt + sitemap.xml
+✅ .npmrc fix dla React 19 kompatybilności
 ```
 
-### FAZA 2: Kompletny sklep
-
-#### Zadania SEKWENCYJNE:
+### FAZA 3: MVP -- Płatności ✅ UKOŃCZONA
 
 ```
-4. Dynamiczne kategorie w nawigacji
-   └─ Fetch kategorii z API → Header i CategoryGrid
-   └─ Zależy od: nic
-   └─ Blokuje: krok 5
-
-5. Wyszukiwarka w Header
-   └─ Podłączyć useProductSearch do Header input
-   └─ Dropdown z wynikami (max 5-8)
-   └─ Zależy od: krok 4 (nawigacja musi być gotowa)
-
-6. Filtry na CategoryPage
-   └─ State dla filtrów (cena min/max, marki)
-   └─ Filtrowanie client-side lub nowe zapytanie API
-   └─ Zależy od: krok 4 (dynamiczne dane)
+✅ Supabase Edge Function: create-checkout-session (Stripe Checkout z P24/BLIK/kartami)
+✅ Supabase Edge Function: stripe-webhook (aktualizacja statusu zamówienia po płatności)
+✅ CheckoutPage: redirect na Stripe po złożeniu zamówienia
+✅ SuccessPage: obsługa powrotu ze Stripe, czyszczenie koszyka, pobranie order_number
+✅ CORS, error handling, loading state
+✅ Deploy Edge Functions + konfiguracja Stripe webhook
 ```
+
+### FAZA 4: Profesjonalizacja
 
 #### Zadania RÓWNOLEGŁE (agent teams):
 
 ```
-AGENT A: Strony informacyjne
-├─ D. Strona "O nas"
-├─ E. Strona "Kontakt" (z formularzem)
-├─ F. Regulamin sklepu
-├─ G. Polityka prywatności (RODO)
-└─ H. Podłączenie linków w Footer i Header
+AGENT A: Filtry i UX
+├─ A. Filtry na CategoryPage (cena, marka)
+├─ B. Carousel w ProductShowcase (Swiper/Embla)
+├─ C. Logo marek (SVG lub obrazki)
+├─ D. Loading skeletons zamiast "Ładowanie..."
+├─ E. Strona 404
+└─ F. Walidacja formularzy checkout (zod/yup)
 
-AGENT B: Upload i obrazki
-├─ I. Konfiguracja Supabase Storage (bucket "products")
-├─ J. Komponent upload w ProductForm
-├─ K. Upload w CategoryForm
-└─ L. Prawdziwe obrazki kategorii (zastąpienie 2 placeholder'ów)
+AGENT B: Email i powiadomienia
+├─ G. Konfiguracja Resend/SendGrid
+├─ H. Email potwierdzenia zamówienia
+├─ I. Email zmiany statusu zamówienia
+├─ J. Backend formularza kontaktowego
+└─ K. Edge Function do wysyłki maili
 
-AGENT C: Email i powiadomienia
-├─ M. Konfiguracja Resend/SendGrid
-├─ N. Email potwierdzenia zamówienia
-├─ O. Email zmiany statusu zamówienia
-└─ P. Edge Function do wysyłki maili
+AGENT C: Konta klientów
+├─ L. Rejestracja klienta (Supabase Auth)
+├─ M. Logowanie klienta
+├─ N. Profil klienta (dane, adresy)
+├─ O. Historia zamówień klienta
+└─ P. RLS policies dla klientów
 
-AGENT D: SEO i meta
-├─ Q. react-helmet-async (lub odpowiednik)
-├─ R. Dynamiczne <title> i <meta> per strona
-├─ S. Open Graph tagi
-└─ T. Sitemap i robots.txt
+AGENT D: Rozszerzenia admina
+├─ Q. Szczegóły zamówienia (modal/strona)
+├─ R. InPost ShipX (Edge Function)
+├─ S. Generowanie faktur PDF
+├─ T. Śledzenie przesyłki w zamówieniu
+└─ U. Dynamiczny sitemap
 ```
 
-### FAZA 3: Profesjonalny sklep
-
-#### Zadania RÓWNOLEGŁE:
+### Priorytetyzacja -- co dalej?
 
 ```
-AGENT E: Konta klientów
-├─ U. Rejestracja klienta (Supabase Auth)
-├─ V. Logowanie klienta
-├─ W. Profil klienta (dane, adresy)
-├─ X. Historia zamówień klienta
-└─ Y. RLS policies dla klientów
+PRIORYTET 1: Płatności ✅ ZROBIONE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Bramka płatności Stripe (P24/BLIK/karty)
 
-AGENT F: Rozszerzenia admina
-├─ Z. Szczegóły zamówienia (modal/strona)
-├─ AA. InPost ShipX (Edge Function)
-├─ BB. Generowanie faktur PDF
-└─ CC. Śledzenie przesyłki w zamówieniu
+PRIORYTET 2: Email
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔧 Email potwierdzenia zamówienia            ~1 dzień
+🔧 Backend formularza kontaktowego           ~2h
 
-AGENT G: UX improvements
-├─ DD. Carousel w ProductShowcase (Swiper/Embla)
-├─ EE. Logo marek (SVG lub obrazki)
-├─ FF. Loading skeletons zamiast "Ładowanie..."
-├─ GG. Strona 404
-└─ HH. Walidacja formularzy (zod/yup)
-```
+PRIORYTET 3: UX
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔧 Filtry kategorii                          ~4h
+🔧 Walidacja formularzy checkout             ~2h
+🔧 Strona 404                                ~1h
 
-### Priorytetyzacja -- co najpierw?
-
-```
-PRIORYTET 1 (dzień 1-2): Minimalny działający sklep
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ Persystencja koszyka (localStorage)           ~1h
-✅ Fix placeholder image                         ~15min
-✅ Fix delivery cost w CartPage                   ~15min
-✅ Fix walidacja stocku w koszyku                 ~30min
-✅ Breadcrumb z nazwą kategorii z DB              ~15min
-
-PRIORYTET 2 (dzień 3-5): Płatności
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔧 Bramka płatności (Stripe/Przelewy24)          ~2-3 dni
-
-PRIORYTET 3 (dzień 6-8): Użyteczność
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔧 Dynamiczne kategorie (Header + CategoryGrid)  ~2h
-🔧 Wyszukiwarka w Header                         ~3h
-🔧 Strony: Regulamin, Polityka prywatności        ~4h
-🔧 Upload obrazków do Supabase Storage            ~4h
-
-PRIORYTET 4 (tydzień 2+): Profesjonalizacja
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔧 Email powiadomienia (Resend)
+PRIORYTET 4: Profesjonalizacja
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔧 Konta klientów
-🔧 SEO / meta tagi
-🔧 Filtry produktów
 🔧 InPost ShipX
 🔧 Faktury PDF
+🔧 Newsletter
 ```
+
+---
+
+## HISTORIA ZMIAN
+
+| Data | Commit | Opis |
+|------|--------|------|
+| 2026-02-15 | `0b8a19f` | Faza 1: persystencja koszyka, placeholder SVG, walidacja stocku, breadcrumb, delivery fix |
+| 2026-02-15 | `e921705` | 6 dedykowanych obrazków kategorii (cooling, electrical, brakes, filters, exhaust, suspension) |
+| 2026-02-15 | `141bdeb` | Faza 2: strony informacyjne, upload obrazków, SEO Helmet, dynamiczne kategorie, wyszukiwarka |
+| 2026-02-16 | `2da87e3` | Fix: .npmrc z legacy-peer-deps dla React 19 (Vercel ERESOLVE) |
+| 2026-02-16 | `fb3d59a` | Faza 3: Integracja Stripe Checkout z P24, BLIK i kartami (Edge Functions + frontend) |
+| 2026-02-16 | `2859a6c` | Fix: constructEventAsync() w webhook (Deno async crypto) |
 
 ---
 
 ## PODSUMOWANIE
 
-**Stan projektu: ~65% gotowości do MVP**
+**Stan projektu: MVP GOTOWY (~95%)**
 
-Projekt ma solidne fundamenty:
-- Kompletny panel admina z CRUD
-- Działający flow zakupowy (przeglądanie → koszyk → checkout → zamówienie)
-- Dobrze zaprojektowany schemat bazy danych
-- Czysta architektura kodu (hooks, components, api)
-- Integracja InPost GeoWidget
+Sklep jest w pełni funkcjonalny — klient może przeglądać produkty, dodać do koszyka, złożyć zamówienie i opłacić je przez Stripe (Przelewy24, BLIK, karty). Zrealizowane Fazy 1-3:
+- ✅ Persystencja koszyka + walidacja stocku
+- ✅ Wyszukiwarka z dropdown wyników
+- ✅ Dynamiczne kategorie z API (Header + siatka)
+- ✅ Strony prawne (Regulamin, Polityka prywatności) -- wymagane prawnie w PL
+- ✅ Strony informacyjne (O nas, Kontakt)
+- ✅ Upload obrazków w panelu admin (drag & drop + Supabase Storage)
+- ✅ SEO meta tagi na wszystkich stronach + robots.txt + sitemap.xml
+- ✅ 8 dedykowanych obrazków kategorii
+- ✅ **Bramka płatności Stripe** -- P24, BLIK, karty via Supabase Edge Functions
+- ✅ Webhook aktualizujący status zamówienia po płatności
 
-Główne braki do uruchomienia sklepu:
-1. **Bramka płatności** -- krytyczne, zamówienie jest tworzone ale nie opłacane
-2. **Persystencja koszyka** -- klient traci koszyk po odświeżeniu
-3. **Strony prawne** -- regulamin i polityka prywatności wymagane prawnie w Polsce
-4. **Broken linki** -- 10+ linków w Header/Footer prowadzi donikąd
-
-Projekt jest dobrze napisany i może być szybko doprowadzony do stanu produkcyjnego. Największy wysiłek to integracja płatności -- reszta to stosunkowo proste zadania.
+**Drobne pozostałości (nie blokują MVP):**
+- 3 broken linki w Header (/login, /wishlist, /account) -- wymagają kont klientów
+- 3 broken linki w Footer (sekcja konto) -- j.w.
+- Filtry kategorii to UI bez logiki
+- Formularz kontaktowy bez backendu email
+- Statyczny sitemap (brak URL produktów/kategorii)
