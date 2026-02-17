@@ -1,6 +1,6 @@
 import React from 'react';
 import './HeroSection.css';
-import heroBg from '../assets/images/hero_mechanic_suv.png';
+import heroBg from '../assets/images/hero_mechanic_suv.webp';
 
 const HeroSection = () => {
     return (
