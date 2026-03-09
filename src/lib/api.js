@@ -130,6 +130,7 @@ export async function getFeaturedProducts(limit = 6) {
             variants:product_variants(*)
         `)
         .eq('is_active', true)
+        .eq('is_featured', true)
         .order('created_at', { ascending: false })
         .limit(limit);
 

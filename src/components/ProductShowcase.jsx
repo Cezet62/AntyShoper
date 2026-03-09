@@ -23,7 +23,7 @@ const ProductShowcase = ({ onAddToCart }) => {
     const bannerButtonLink = promoBanner?.button_link || '/kategoria/opony';
 
     return (
-        <div className="product-showcase">
+        <div id="promocje" className="product-showcase">
             <div className="container showcase-container">
 
                 <div className="promo-banner" style={{ backgroundImage: `url(${bannerImage})` }}>

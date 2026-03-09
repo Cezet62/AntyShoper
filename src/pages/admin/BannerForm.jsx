@@ -89,8 +89,8 @@ export default function BannerForm() {
     }
 
     const slotOptions = [
-        { value: 'hero', label: 'Baner główny (hero) — duży baner na górze strony' },
-        { value: 'promo_main', label: 'Baner promocyjny — obok sekcji promocji' }
+        { value: 'hero', label: 'Baner główny — duży baner na górze strony' },
+        { value: 'promo_main', label: 'Baner promocyjny — obok produktów w sekcji promocji' }
     ];
 
     return (

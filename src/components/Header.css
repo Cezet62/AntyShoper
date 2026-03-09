@@ -99,6 +99,22 @@
     color: var(--color-accent);
 }
 
+.nav-promo-cta {
+    background-color: var(--color-accent);
+    color: #fff !important;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.nav-promo-cta:hover {
+    background-color: #c0392b;
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
 .search-dropdown {
     position: absolute;
     top: 100%;

@@ -17,7 +17,8 @@ export default function ProductForm() {
         category_id: '',
         compatibility_tags: '',
         images: [],
-        is_active: true
+        is_active: true,
+        is_featured: false
     });
 
     const [variants, setVariants] = useState([
@@ -65,7 +66,8 @@ export default function ProductForm() {
             category_id: data.category_id || '',
             compatibility_tags: data.compatibility_tags || '',
             images: data.images || [],
-            is_active: data.is_active
+            is_active: data.is_active,
+            is_featured: data.is_featured || false
         });
 
         if (data.variants?.length > 0) {
@@ -164,7 +166,8 @@ export default function ProductForm() {
                 category_id: formData.category_id || null,
                 compatibility_tags: formData.compatibility_tags,
                 images: formData.images,
-                is_active: formData.is_active
+                is_active: formData.is_active,
+                is_featured: formData.is_featured
             };
 
             let productId = id;
@@ -318,6 +321,17 @@ export default function ProductForm() {
                                 onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
                             />
                             Produkt aktywny (widoczny w sklepie)
+                        </label>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="checkbox-label">
+                            <input
+                                type="checkbox"
+                                checked={formData.is_featured}
+                                onChange={(e) => setFormData(prev => ({ ...prev, is_featured: e.target.checked }))}
+                            />
+                            Pokaż w promocjach na stronie głównej
                         </label>
                     </div>
                 </div>

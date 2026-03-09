@@ -60,8 +60,8 @@ export default function Banners() {
     }
 
     const slotLabels = {
-        hero: 'Baner główny (hero)',
-        promo_main: 'Baner promocyjny'
+        hero: 'Baner główny (góra strony)',
+        promo_main: 'Baner promocyjny (sekcja promocji)'
     };
 
     if (loading) {

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Header.css';
 import logo from '../assets/images/logo_autopartsdirect.png';
 import { getCategories } from '../lib/api';
@@ -11,7 +11,21 @@ const Header = ({ cartCount }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showResults, setShowResults] = useState(false);
     const searchRef = useRef(null);
+    const navigate = useNavigate();
+    const location = useLocation();
     const { products: searchResults, loading: searchLoading } = useProductSearch(searchQuery);
+
+    const scrollToPromo = (e) => {
+        e.preventDefault();
+        if (location.pathname === '/') {
+            document.getElementById('promocje')?.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            navigate('/');
+            setTimeout(() => {
+                document.getElementById('promocje')?.scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+        }
+    };
 
     useEffect(() => {
         getCategories().then(data => setCategories(data.filter(c => !c.parent_id)));
@@ -120,6 +134,7 @@ const Header = ({ cartCount }) => {
                         {categories.map(cat => (
                             <li key={cat.id}><Link to={`/kategoria/${cat.slug}`}>{cat.name.toUpperCase()}</Link></li>
                         ))}
+                        <li><a href="/#promocje" onClick={scrollToPromo} className="nav-promo-cta">PROMOCJE</a></li>
                     </ul>
                 </div>
             </nav>
