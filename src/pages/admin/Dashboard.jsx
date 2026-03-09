@@ -97,6 +97,10 @@ export default function Dashboard() {
                         <span className="action-icon">📁</span>
                         <span>Dodaj kategorię</span>
                     </Link>
+                    <Link to="/admin/banery" className="action-card">
+                        <span className="action-icon">🖼</span>
+                        <span>Edytuj banery</span>
+                    </Link>
                     <Link to="/" target="_blank" className="action-card">
                         <span className="action-icon">🌐</span>
                         <span>Zobacz sklep</span>

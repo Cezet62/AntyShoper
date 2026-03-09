@@ -44,6 +44,10 @@ export default function AdminLayout() {
                         <span className="nav-icon">🛒</span>
                         Zamówienia
                     </Link>
+                    <Link to="/admin/banery" className={`nav-item ${location.pathname.startsWith('/admin/banery') ? 'active' : ''}`}>
+                        <span className="nav-icon">🖼</span>
+                        Banery
+                    </Link>
                 </nav>
 
                 <div className="admin-user">

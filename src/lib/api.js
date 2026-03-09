@@ -1,6 +1,32 @@
 import { supabase } from './supabase';
 
 // =============================================
+// BANERY
+// =============================================
+
+export async function getBanners() {
+    const { data, error } = await supabase
+        .from('banners')
+        .select('*')
+        .order('sort_order');
+
+    if (error) throw error;
+    return data;
+}
+
+export async function getBannerBySlot(slot) {
+    const { data, error } = await supabase
+        .from('banners')
+        .select('*')
+        .eq('slot', slot)
+        .eq('is_active', true)
+        .maybeSingle();
+
+    if (error) throw error;
+    return data;
+}
+
+// =============================================
 // KATEGORIE
 // =============================================
 

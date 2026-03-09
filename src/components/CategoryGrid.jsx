@@ -3,23 +3,28 @@ import { Link } from 'react-router-dom';
 import './CategoryGrid.css';
 import { getCategories } from '../lib/api';
 
-import engineImg from '../assets/images/category_engine.png';
-import coolingImg from '../assets/images/category_cooling.png';
-import electricalImg from '../assets/images/category_electrical.png';
-import wheelImg from '../assets/images/category_wheel.png';
-import brakesImg from '../assets/images/category_brakes.png';
-import filtersImg from '../assets/images/category_filters.png';
-import exhaustImg from '../assets/images/category_exhaust.png';
-import suspensionImg from '../assets/images/category_suspension.png';
+import engineImg from '../assets/images/category_engine.webp';
+import coolingImg from '../assets/images/category_cooling.webp';
+import electricalImg from '../assets/images/category_electrical.webp';
+import wheelImg from '../assets/images/category_wheel.webp';
+import brakesImg from '../assets/images/category_brakes.webp';
+import filtersImg from '../assets/images/category_filters.webp';
+import exhaustImg from '../assets/images/category_exhaust.webp';
+import suspensionImg from '../assets/images/category_suspension.webp';
+import partsImg from '../assets/images/category_parts.webp';
+import oilImg from '../assets/images/category_oil.webp';
+import fluidsImg from '../assets/images/category_fluids.webp';
+import toolsImg from '../assets/images/category_tools.webp';
+import accessoriesImg from '../assets/images/category_accessories.webp';
 
 // Fallback obrazków po slug — mapuje slug kategorii na lokalne assety
 const fallbackImages = {
     // Kategorie główne
-    'czesci': engineImg,
-    'oleje': engineImg,
+    'czesci': partsImg,
+    'oleje': fluidsImg,
     'opony': wheelImg,
-    'narzedzia': engineImg,
-    'akcesoria': wheelImg,
+    'narzedzia': toolsImg,
+    'akcesoria': accessoriesImg,
     // Podkategorie
     'silnik': engineImg,
     'chlodzenie': coolingImg,
@@ -29,7 +34,7 @@ const fallbackImages = {
     'filtry': filtersImg,
     'wydech': exhaustImg,
     'zawieszenie': suspensionImg,
-    'oleje-silnikowe': engineImg,
+    'oleje-silnikowe': oilImg,
     'plyny-hamulcowe': brakesImg,
     'plyny-chlodnicze': coolingImg,
     'opony-letnie': wheelImg,

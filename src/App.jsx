@@ -24,6 +24,8 @@ import CategoryForm from './pages/admin/CategoryForm';
 import Products from './pages/admin/Products';
 import ProductForm from './pages/admin/ProductForm';
 import Orders from './pages/admin/Orders';
+import Banners from './pages/admin/Banners';
+import BannerForm from './pages/admin/BannerForm';
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -112,6 +114,9 @@ function App() {
             <Route path="produkty/nowy" element={<ProductForm />} />
             <Route path="produkty/:id" element={<ProductForm />} />
             <Route path="zamowienia" element={<Orders />} />
+            <Route path="banery" element={<Banners />} />
+            <Route path="banery/nowy" element={<BannerForm />} />
+            <Route path="banery/:id" element={<BannerForm />} />
           </Route>
 
           {/* Shop Routes */}

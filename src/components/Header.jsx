@@ -37,7 +37,7 @@ const Header = ({ cartCount }) => {
                         <span>+48 123 456 789</span>
                     </div>
                     <div className="user-links">
-                        <Link to="/login">Zaloguj się</Link>
+                        <a href="mailto:kontakt@sklep.pl">kontakt@sklep.pl</a>
                     </div>
                 </div>
             </div>
@@ -91,8 +91,6 @@ const Header = ({ cartCount }) => {
                     </div>
 
                     <div className="header-actions">
-                        <Link to="/wishlist" className="action-item">❤️</Link>
-                        <Link to="/account" className="action-item">👤</Link>
                         <Link to="/koszyk" className="action-item" style={{ position: 'relative' }}>
                             🛒
                             {cartCount > 0 && (

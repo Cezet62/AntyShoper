@@ -24,12 +24,10 @@ const Footer = () => {
                 </div>
 
                 <div className="footer-section account">
-                    <h5>Moje konto</h5>
+                    <h5>Sklep</h5>
                     <ul>
-                        <li><a href="#">Logowanie</a></li>
-                        <li><a href="#">Rejestracja</a></li>
-                        <li><a href="#">Historia zamówień</a></li>
-                        <li><a href="#">Koszyk</a></li>
+                        <li><Link to="/koszyk">Koszyk</Link></li>
+                        <li><Link to="/">Wszystkie produkty</Link></li>
                     </ul>
                 </div>
 
